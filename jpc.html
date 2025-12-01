@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紅白大歌星 - 遊戲流程總覽</title>
+    <!-- 載入 Inter 字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <!-- 載入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 使用 Inter 字體 */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0f172a; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 確保影片作為全螢幕背景 */
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100; 
+            object-fit: cover;
+            /* 新增影片濾鏡過渡效果 */
+            transition: filter 0.5s ease; 
+        }
+
+        /* 影片變灰/變暗 */
+        .video-dimmed {
+            filter: grayscale(80%) brightness(50%);
+        }
+
+        /* 內容疊層 */
+        #app-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: 100%; 
+            /* 讓內容在頁面中間 */
+            justify-content: center; 
+            align-items: center;
+            padding: 1rem; 
+            transition: opacity 0.3s ease; 
+        }
+
+        .text-shadow {
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* --- 動畫 --- */
+        @keyframes pulse-once {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); box-shadow: 0 0 20px rgba(255, 255, 255, 0.6); }
+            100% { transform: scale(1); }
+        }
+        .pulse-once {
+            animation: pulse-once 0.8s ease-in-out;
+        }
+        
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.02); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s infinite ease-in-out;
+        }
+        
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 2s ease-in-out infinite;
+        }
+
+        /* --- 卡片 3D 翻轉 --- */
+        .card-container {
+            perspective: 1000px; 
+            position: relative;
+            width: 100%;
+            height: 100%; 
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        
+        .card-container:not(.is-flipped):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            z-index: 20;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; 
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border-radius: 0.375rem; 
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); 
+            padding: 0.25rem; 
+        }
+
+        .card-front {
+            transform: rotateY(0deg);
+            border: 2px solid rgba(255, 255, 255, 0.4); 
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background-color: #374151; 
+            border: 2px solid #10B981;
+            box-shadow: inset 0 0 10px #10B981; 
+        }
+
+        .card-container.is-flipped .card-front {
+            transform: rotateY(180deg);
+        }
+        .card-container.is-flipped .card-back {
+            transform: rotateY(360deg);
+        }
+        
+        /* --- Grid Layout (核心佈局 - 調整為直式排列 & 更緊湊) --- */
+        #game-board-grid {
+            display: grid;
+            /* 6 欄位佈局 (代表 6 個類別) */
+            grid-template-columns: repeat(6, 1fr); 
+            gap: 0.25rem; /* 網格間距縮小 */
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* 將標頭設定為佔用網格空間 (高度縮小) */
+        .category-column-header-cell {
+            height: 3rem; /* 高度縮小 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.25rem;
+            font-weight: 800;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            border-radius: 0.25rem; /* 稍微縮小圓角 */
+            font-size: 0.875rem; /* 字體縮小 */
+        }
+        
+        /* 確保遊戲板卡片高度一致 */
+        #game-board-grid .card-container {
+            height: 5rem; 
+        }
+
+        /* Modal 樣式 - 確保內容置中且完整呈現 */
+        .modal-content-area {
+            /* 確保內容可以垂直滾動 */
+            max-height: 90vh; 
+            overflow-y: auto; 
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 全螢幕背景影片 -->
+    <video autoplay loop muted playsinline id="video-background">
+        <source src="https://lochoive-code.github.io/video/redwhite-game.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
+    </video>
+
+    <!-- 半透明遮罩 (用於動態 dimming effect，初始透明) -->
+    <div id="dimming-overlay" class="fixed inset-0 bg-black z-0 opacity-0 transition-opacity duration-500"></div>
+
+    <!-- 主應用容器 -->
+    <div id="app-container">
+        <!-- 內容由 JS 注入 -->
+    </div>
+
+    <!-- 選單 Modal (通用於選單和卡片內容展示) -->
+    <div id="game-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <!-- 預設為最大卡片尺寸 (max-w-2xl) -->
+        <div id="modal-content-wrapper" class="bg-gray-900 text-white rounded-xl shadow-2xl w-full max-w-2xl border-4 border-yellow-400 p-2 transform scale-95 opacity-0 transition-all duration-300 relative">
+            <!-- 新增通用關閉按鈕，用於 Menu 頁面返回 Home -->
+            <button id="modal-close-home-btn" onclick="closeModalAndGoHome()" class="absolute top-3 right-3 text-gray-400 hover:text-red-400 transition z-20 hidden">
+                <i data-lucide="x-circle" class="w-8 h-8"></i>
+            </button>
+            <div id="modal-content" class="modal-content-area">
+                <!-- 內容由 JS 注入 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 資料設定 ---
+        const VIDEO_URLS = {
+            HOME: "https://lochoive-code.github.io/video/redwhite-game.mp4",
+            GAME: "https://lochoive-code.github.io/video/redwhite-game_02.mp4" 
+        };
+
+        const CATEGORY_COLORS = [
+            { header_bg: 'bg-red-600', bg: 'bg-red-500/80', hover: 'bg-red-500', text: 'text-white', name: '音樂題', icon: 'music' }, // A
+            { header_bg: 'bg-blue-600', bg: 'bg-blue-500/80', hover: 'bg-blue-500', text: 'text-white', name: '歌詞填空', icon: 'mic' }, // B
+            { header_bg: 'bg-green-600', bg: 'bg-green-500/80', hover: 'bg-green-500', text: 'text-white', name: '主題/廣告歌', icon: 'megaphone' }, // C
+            { header_bg: 'bg-purple-600', bg: 'bg-purple-500/80', hover: 'bg-purple-500', text: 'text-white', name: '快問快答', icon: 'zap' }, // D
+            { header_bg: 'bg-indigo-600', bg: 'bg-indigo-500/80', hover: 'bg-indigo-500', text: 'text-white', name: '經典/本土歌', icon: 'book-open' }, // E
+            { header_bg: 'bg-yellow-500', bg: 'bg-yellow-400/80', hover: 'bg-yellow-400', text: 'text-gray-900', name: '加碼題', icon: 'wand' } // F
+        ];
+        
+        const CATEGORY_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']; 
+        const ROW_COUNT = 5; 
+
+        // 流程說明步驟 (白色球：紅白大歌星)
+        const WHITE_BALL_STEPS = [
+            { title: "派代表上台", description: "各桌推派 1 位代表上台參加遊戲。", icon: "user-plus" },
+            { title: "搶答進行", description: "每題由紅白隊各派 1 人搶答，答對者留在台上。", icon: "message-square" },
+            { title: "答題獎勵", description: "答對者可獲扭蛋獎。", icon: "gift" },
+            { title: "判定勝負", description: "遊戲結束時，留在台上的紅白隊人數多寡決定勝利隊伍。", icon: "trophy" },
+            { title: "抽取幸運兒", description: "勝利隊伍從專屬獎池抽出 1 位幸運兒獲得遊戲獎金；若平手，兩隊各有一次抽獎機會。", icon: "star" }
+        ];
+        
+        // 流程說明步驟 (紅色球：紅白拳王爭霸戰 - 新增)
+        const RED_BALL_STEPS = [
+            { title: "全員起立", description: "全體起立，準備與舞台前方的總經理或董事長進行猜拳。", icon: "users" },
+            { title: "猜拳對決", description: "與舞台對手進行猜拳。\n猜輸者：可坐下，享用美食。\n猜贏者：繼續下一輪挑戰。", icon: "hand-metal" },
+            { title: "剩餘挑戰者", description: "遊戲進行至剩下最後 10 人。\n每位剩下的參加者可獲得 扭蛋獎。", icon: "gift" },
+            { title: "判定勝隊", description: "根據最後 10 人中紅白隊人數多寡，判定 獲勝隊伍。", icon: "trophy" },
+            { title: "抽獎贈獎", description: "獲勝隊伍可從專屬獎池抽出一位幸運兒，獲得 遊戲獎金。\n若兩隊平手，則兩隊各有一次抽獎機會。", icon: "star" }
+        ];
+
+        // 拳王動作教學的動作定義
+        const PUNCH_KING_ACTIONS = [
+            { 
+                id: 101,
+                name: "剪刀", 
+                emoji: "✌️", 
+                instruction: "雙手比剪刀，代表 <span class='text-red-400 font-black'>'紅' 隊</span> 陣營！", // Simplified single sentence
+                color: "red", // 紅隊
+                actionImage: "https://lochoive-code.github.io/redwhitegames/scissors.png" // Vertical photo placeholder
+            },
+            { 
+                id: 100, 
+                name: "石頭", 
+                emoji: "👊", 
+                instruction: "雙手握拳頭，代表 <span class='text-white font-black'>'白' 隊</span> 陣營！", // Simplified single sentence
+                color: "white", // 白隊
+                actionImage: "https://lochoive-code.github.io/redwhitegames/stone.png" // Vertical photo placeholder
+            },
+            { 
+                id: 102,
+                name: "布", 
+                emoji: "🖐️", 
+                instruction: "雙手張開成布，多用於 <span class='text-yellow-400 font-black'>'和局' 或 '特殊指令'</span>。", 
+                color: "yellow",
+                actionImage: "https://lochoive-code.github.io/redwhitegames/cloth.png" // Vertical photo placeholder
+            }
+        ];
+
+
+        // --- 狀態變數 ---
+        let fastQATimerInterval = null;
+        let cardData = [];
+        let currentWhiteStep = 0; // 追蹤紅白大歌星 (White Ball) 步驟
+        let currentRedStep = 0;   // 追蹤紅白拳王爭霸戰 (Red Ball) 步驟
+        const appContainer = document.getElementById('app-container');
+        const gameModal = document.getElementById('game-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalWrapper = document.getElementById('modal-content-wrapper');
+        const dimmingOverlay = document.getElementById('dimming-overlay'); // 新增 dimming overlay 元素
+        const modalCloseHomeBtn = document.getElementById('modal-close-home-btn'); // 新增 modal close button 元素
+
+        // --- 題目資料庫 ---
+        const MUSIC_ANSWERS = [
+            { name: "題目 A1", song: "Love Story", artist: "Taylor Swift", audio: "https://lochoive-code.github.io/redwhitegames/love-story-q.mp3" },
+            { name: "題目 A2", song: "隱形的翅膀", artist: "張韶涵", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "題目 A3", song: "小幸運", artist: "田馥甄", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { name: "題目 A4", song: "告白氣球", artist: "周杰倫", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { name: "題目 A5", song: "三天三夜", artist: "張惠妹", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+        ];
+        
+        const GAP_FILL_ANSWERS = [
+            { name: "B1", question: "原來你是我最想留住的幸運...", answer: "原來我們和愛情曾經靠得那麼近", hint: "★★★★★★★★★★★★★★ (14 字)", from: "田馥甄《小幸運》" },
+            { name: "B2", question: "你問我愛你有多深...", answer: "我愛你有幾分", hint: "★★★★★★★★ (8 字)", from: "鄧麗君《月亮代表代表我的心》" },
+            { name: "B3", question: "對面的女孩看過來...", answer: "這裡的表演很精彩", hint: "★★★★★★★★ (8 字)", from: "任賢齊《對面的女孩看過來》" },
+            { name: "B4", question: "原諒我這一生不羈放縱愛自由...", answer: "也會怕有一天會跌倒", hint: "★★★★★★★★★ (9 字)", from: "Beyond《海闊天空》" },
+            { name: "B5", question: "我們一起學貓叫...", answer: "一起喵喵喵喵喵", hint: "★★★★★★★ (7 字)", from: "小潘潘 / 小峰峰《學貓叫》" }
+        ];
+
+        const THEME_SONG_ANSWERS = [
+            { name: "C1", type: "image", question: "這張圖片是哪一部經典偶像劇的主題曲？", image: "https://placehold.co/600x400/7C3AED/ffffff?text=C1+偶像劇+圖片", answerType: "text", answerText: "流星花園 - 情非得已" },
+            { name: "C2", type: "audio", question: "這是哪一支知名廣告歌？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", answerType: "video", answerVideo: "https://www.w3schools.com/tags/movie.mp4" },
+            { name: "C3", type: "audio", question: "這是哪部卡通或動畫的主題曲？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", answerType: "video", answerVideo: "https://www.w3schools.com/html/mov_bbb.mp4" },
+            { name: "C4", type: "image", question: "這張圖片代表的電影主題曲是？", image: "https://placehold.co/600x400/D97706/ffffff?text=C4+電影+圖片", answerType: "text", answerText: "鐵達尼號 - My Heart Will Go On" },
+            { name: "C5", type: "image", question: "這是哪個品牌的經典廣告畫面？", image: "https://placehold.co/600x400/10B981/ffffff?text=C5+品牌+圖片", answerType: "text", answerText: "Nike - Just Do It" }
+        ];
+
+        const FAST_QA_ANSWERS = [
+            // D1 (純文字問答)
+            { type: 'text', question: 'Baby shark, doo doo doo doo doo doo，請接唱下一句！', answer: 'Baby shark, doo doo doo doo doo doo' },
+            // D2 (圖片答案)
+            { type: 'image_answer', question: '請問哪座山是台灣最高的山？ (請指出圖片)', answer: '玉山', answerImage: 'https://placehold.co/600x400/10B981/ffffff?text=D2+台灣高山圖示' },
+            // D3 (圖片答案)
+            { type: 'image_answer', question: '請問白雪公主吃了什麼水果中毒？ (請指出正確圖片)', answer: '毒蘋果', answerImage: 'https://placehold.co/600x400/DC2626/ffffff?text=D3+白雪公主的毒蘋果' },
+            // D4 (圖片答案)
+            { type: 'image_answer', question: '請問這是哪位著名華語歌星？ (請指出圖片)', answer: '周杰倫', answerImage: 'https://placehold.co/600x400/9333EA/ffffff?text=D4+歌星+周杰倫' },
+            // D5 (圖片答案)
+            { type: 'image_answer', question: '請指出哪張圖片代表了「疑是地上霜」的意境？ (請指出圖片)', answer: '月光照地的圖片', answerImage: 'https://placehold.co/600x400/FACC15/000000?text=D5+月光下的霜' }
+        ];
+        
+        const CLASSIC_QA_ANSWERS = {
+            E0: { name: "E1", type: "audio-line", question: "「從我咩到你咩，一共五步」\n請問這句台詞出自哪部電影？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", answerText: "不能說的秘密" },
+            E1: { name: "E2", type: "sing-song", question: "請唱出台語歌曲《一支小雨傘》的歌詞", requirement: "至少唱出 兩句以上", answerText: "一支小雨傘 仔\n予你遮予我蓋", from: "洪榮宏/江蕙" },
+            E2: { name: "E3", type: "sing-song", question: "請唱出台語歌曲《一支小雨傘》的歌詞", requirement: "至少唱出 兩句以上", answerText: "提出小雨傘 遮著你人濟\n不甘來乎你淋著雨水", from: "洪榮宏/江蕙" },
+            E3: { name: "E4", type: "sing-song", question: "請唱出《愛拚才會贏》任一段落", requirement: "至少唱出 兩句以上", answerText: "一時失志不免怨嘆\n一時落魄不免膽寒", from: "葉啟田" },
+            E4: { name: "E5", type: "list-artist", question: "請說出歌手《伍佰》的經典歌曲", requirement: "須回答 三首", answerText: "挪威的森林、浪人情歌、被動", from: "伍佰" },
+            F0: { name: "F1 (我幫你選)", type: "audio-line", question: "《永遠不回頭》是哪部電影的主題曲？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", answerText: "《七匹狼》 (1989)" },
+            F1: { name: "F2 (我幫你選)", type: "list-artist", question: "請說出《五月天》的經典歌曲", requirement: "須回答 三首", answerText: "倔強、擁抱、突然好想你", from: "五月天" },
+            F2: { name: "F3 (我幫你選)", type: "audio-line", question: "聽前奏猜歌名", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", answerText: "稻香", from: "周杰倫" },
+            F3: { name: "F4 (我幫你選)", type: "sing-song", question: "請用「啦啦啦」哼唱《童話》副歌", requirement: "哼唱出一段即可", answerText: "光良 - 童話", from: "光良" },
+            F4: { name: "F5 (我幫你選)", type: "list-artist", question: "請列舉 3 首 S.H.E 的歌曲", requirement: "須回答 三首", answerText: "戀人未滿、Super Star、波斯貓", from: "S.H.E" }
+        };
+
+        // --- 輔助函式 ---
+        function setVideoBackground(url) {
+            const v = document.getElementById('video-background');
+            const s = v.querySelector('source');
+            if(s) { 
+                if(s.src !== url) { 
+                    s.src = url; 
+                    v.load(); 
+                    v.play().catch(()=>{}); 
+                }
+            } else {
+                v.src = url;
+                v.load(); 
+                v.play().catch(()=>{});
+            }
+        }
+
+        window.stopAllAudio = function() {
+            document.querySelectorAll('audio, video').forEach(el => {
+                if(el.id !== 'video-background') { el.pause(); el.currentTime = 0; }
+            });
+            clearInterval(fastQATimerInterval);
+        }
+        
+        // 新增：關閉 Modal 並返回首頁
+        window.closeModalAndGoHome = function() {
+            stopAllAudio();
+            // 執行 Modal 隱藏動畫
+            modalWrapper.classList.remove('scale-100', 'opacity-100');
+            modalWrapper.classList.add('scale-95', 'opacity-0');
+            
+            // 延遲隱藏 Modal 容器並返回首頁
+            setTimeout(() => {
+                gameModal.classList.add('hidden');
+                // 隱藏 Menu Modal 的 Home 按鈕
+                modalCloseHomeBtn.classList.add('hidden'); 
+                renderHomePage(); 
+            }, 300);
+        }
+
+
+        // --- 核心邏輯：卡片翻轉與內容展示 (用於紅白大歌星) ---
+        window.flipCard = function(cardId) {
+            const card = cardData.find(c => c.id === cardId);
+            if (!card) return;
+
+            // 1. 翻轉卡片視覺 (若是第一次)
+            if (!card.isFlipped) {
+                const cardEl = document.getElementById(`card-${cardId}`);
+                if (cardEl) {
+                    cardEl.classList.add('is-flipped');
+                    card.isFlipped = true;
+                }
+            }
+
+            // 2. 開啟內容 Modal
+            openContentModal(card);
+        }
+
+        function openContentModal(card) {
+            stopAllAudio(); 
+
+            // 隱藏 Menu Modal 的 Home 按鈕 (因為題目卡片內部有自己的 X 按鈕)
+            modalCloseHomeBtn.classList.add('hidden');
+
+            // 恢復 Modal wrapper 樣式為題目卡片模式 (較大)
+            modalWrapper.classList.remove('max-w-lg', 'max-w-md', 'border-red-600');
+            modalWrapper.classList.add('max-w-2xl', 'border-yellow-400');
+            
+            // 設定 Modal 內容
+            modalContent.innerHTML = getGameContentHTML(card);
+            
+            // 讓 Modal 彈出
+            gameModal.classList.remove('hidden');
+            
+            // 執行 Modal 彈出動畫
+            setTimeout(() => {
+                modalWrapper.classList.remove('scale-95', 'opacity-0');
+                modalWrapper.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            lucide.createIcons();
+        }
+
+        window.closeContentModal = function() {
+            stopAllAudio();
+            // 執行 Modal 隱藏動畫
+            modalWrapper.classList.remove('scale-100', 'opacity-100');
+            modalWrapper.classList.add('scale-95', 'opacity-0');
+            
+            // 重設 Modal wrapper 為預設尺寸 (用於題目卡片)
+            modalWrapper.classList.remove('max-w-lg', 'max-w-md', 'border-red-600');
+            modalWrapper.classList.add('max-w-2xl', 'border-yellow-400');
+
+            // 延遲隱藏 Modal 容器
+            setTimeout(() => {
+                gameModal.classList.add('hidden');
+            }, 300); 
+        }
+
+        // --- HTML 內容生成器 (已優化 D 類別) ---
+        function getGameContentHTML(card) {
+            // 題目卡片內部的關閉按鈕
+            const closeBtn = `
+                <button onclick="closeContentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-20">
+                    <i data-lucide="x-circle" class="w-8 h-8"></i>
+                </button>
+            `;
+            
+            let content = '';
+            const category = CATEGORY_COLORS[card.col];
+            const label = `${CATEGORY_LETTERS[card.col]}${card.row + 1}`;
+
+            // A: 音樂題
+            if (card.col === 0) {
+                const data = MUSIC_ANSWERS[card.row] || {};
+                content = `
+                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                        ${closeBtn}
+                        <h3 class="text-3xl font-bold text-red-400 mb-2">${category.name} - ${label}</h3>
+                        <p class="text-lg text-gray-300 mb-6">請聆聽音樂並回答歌名與歌手</p>
+                        
+                        <div class="w-full max-w-lg bg-gray-900 p-4 rounded-xl border border-red-500/30 mb-6 shadow-xl">
+                            <audio id="active-audio" controls autoplay src="${data.audio}" class="w-full mb-2"></audio>
+                            <p class="text-xs text-yellow-500">🔊 若無法自動播放，請手動點擊播放</p>
+                        </div>
+
+                        <div id="answer-box" class="hidden w-full max-w-lg bg-red-900/40 p-4 rounded-lg border border-red-500 mb-4 animate-expand">
+                            <p class="text-sm text-red-400 font-bold">正確答案</p>
+                            <p class="text-2xl font-bold text-white mt-1">${data.song || '資料遺失'}</p>
+                            <p class="text-md text-gray-300">${data.artist || ''}</p>
+                        </div>
+
+                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
+                            <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 看答案
+                        </button>
+                    </div>
+                `;
+            }
+            // B: 歌詞填空
+            else if (card.col === 1) {
+                const data = GAP_FILL_ANSWERS[card.row] || {};
+                content = `
+                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                        ${closeBtn}
+                        <h3 class="text-3xl font-bold text-blue-400 mb-4">${category.name} - ${label}</h3>
+                        
+                        <div class="bg-gray-900 p-6 rounded-xl border-2 border-blue-500/50 mb-6 w-full max-w-3xl shadow-xl">
+                            <p class="text-xl text-yellow-300 mb-3"><i data-lucide="pencil" class="inline w-5 h-5 mr-1"></i> 接出下一句歌詞</p>
+                            <p class="text-2xl md:text-4xl font-black text-white leading-relaxed mb-4">${data.question || '資料遺失'}</p>
+                            <p class="text-xl font-bold text-red-400">${data.hint || ''}</p>
+                        </div>
+
+                        <div id="answer-box" class="hidden w-full max-w-3xl bg-blue-900/40 p-6 rounded-lg border border-blue-500 mb-4 animate-expand">
+                            <p class="text-3xl font-bold text-white">${data.answer || ''}</p>
+                            <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
+                        </div>
+
+                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
+                            <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 看答案
+                        </button>
+                    </div>
+                `;
+            }
+            // C: 主題/廣告歌
+            else if (card.col === 2) {
+                const data = THEME_SONG_ANSWERS[card.row] || {};
+                let mediaHtml = '';
+                if(data.type === 'image') {
+                    mediaHtml = `<img src="${data.image}" class="max-h-64 rounded-lg border border-green-500 mx-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">`;
+                } else {
+                    mediaHtml = `<audio id="active-audio" controls autoplay src="${data.audio}" class="w-full"></audio>`;
+                }
+
+                let answerHtml = '';
+                if(data.answerType === 'video') {
+                    answerHtml = `
+                        <div class="video-container">
+                            <video id="ans-video" controls src="${data.answerVideo}"></video>
+                        </div>
+                    `;
+                } else {
+                    answerHtml = `<p class="text-3xl font-bold text-white">${data.answerText}</p>`;
+                }
+
+                content = `
+                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                        ${closeBtn}
+                        <h3 class="text-3xl font-bold text-green-400 mb-4">${category.name} - ${label}</h3>
+                        <p class="text-xl text-yellow-300 mb-4">${data.question}</p>
+                        
+                        <div class="w-full max-w-3xl bg-gray-900 p-4 rounded-xl border border-green-500/30 mb-6 shadow-xl">
+                            ${mediaHtml}
+                        </div>
+
+                        <div id="answer-box" class="hidden w-full max-w-3xl bg-green-900/40 p-4 rounded-lg border border-green-500 mb-4 animate-expand">
+                            ${answerHtml}
+                        </div>
+
+                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden'); const v=document.getElementById('ans-video'); if(v) v.play();" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
+                            <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 看答案
+                        </button>
+                    </div>
+                `;
+            }
+            // D: 快問快答 (已更新 D2-D5 的圖片答案顯示)
+            else if (card.col === 3) {
+                const data = FAST_QA_ANSWERS[card.row] || {};
+                let interactionAreaContent = '';
+                let answerDisplayHtml = '';
+
+                // --- 答案顯示區塊 (包含圖片或純文字) ---
+                if (data.type === 'image_answer' && data.answerImage) {
+                    answerDisplayHtml = `
+                        <div class="flex flex-col items-center p-4">
+                            <p class="text-2xl font-bold text-white mb-3">${data.answer}</p>
+                            <img src="${data.answerImage}" class="max-h-64 rounded-lg border-4 border-purple-500 shadow-xl" 
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x400/4B5563/ffffff?text=圖片載入失敗';" 
+                                alt="答案圖片">
+                        </div>
+                    `;
+                } else {
+                    answerDisplayHtml = `<p class="text-3xl font-bold text-white">${data.answer}</p>`;
+                }
+
+                // --- 互動區域 (按鈕) ---
+                if (data.type === 'mcq') {
+                    // 選擇題
+                    interactionAreaContent = `<div class="grid grid-cols-2 gap-4 mt-4 w-full max-w-2xl">
+                        ${data.options.map((opt, idx) => `
+                            <button onclick="handleFastQaOption(this, ${opt.isCorrect})" class="p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-xl font-bold transition text-white">${opt.text}</button>
+                        `).join('')}
+                    </div>`;
+                } else {
+                    // 純文字問答 或 圖片答案 (主持人根據實際情況判定對錯)
+                    interactionAreaContent = `
+                        <div class="flex space-x-4 mt-4">
+                            <button onclick="showFastQaResult(true)" class="px-6 py-3 bg-green-600 rounded-full font-bold transition transform hover:scale-105">答對</button>
+                            <button onclick="showFastQaResult(false)" class="px-6 py-3 bg-red-600 rounded-full font-bold transition transform hover:scale-105">答錯/看答案</button>
+                        </div>
+                    `;
+                }
+
+
+                content = `
+                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                        ${closeBtn}
+                        <div class="flex justify-between w-full max-w-3xl items-center mb-4">
+                            <h3 class="text-3xl font-bold text-purple-400">${category.name} - ${label}</h3>
+                            <div id="timer-display" class="text-5xl font-mono font-black text-white bg-gray-900 px-4 py-2 rounded border border-purple-500">5</div>
+                        </div>
+
+                        <div id="qa-start-overlay" class="absolute inset-0 bg-gray-800/90 z-10 flex flex-col items-center justify-center rounded-lg">
+                            <button onclick="startFastQa(this)" class="px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white text-2xl font-bold rounded-full shadow-xl pulse-once">
+                                開始計時 (5秒)
+                            </button>
+                        </div>
+
+                        <div class="w-full max-w-3xl bg-gray-900 p-8 rounded-xl border-2 border-purple-500 mb-4 min-h-[150px] flex flex-col items-center justify-center shadow-xl">
+                            <p class="text-3xl md:text-4xl font-bold text-white">${data.question}</p>
+                            <div id="qa-interaction-area" class="hidden w-full flex flex-col items-center">
+                                ${interactionAreaContent}
+                            </div>
+                        </div>
+
+                        <div id="qa-result" class="hidden mt-4 animate-expand">
+                             <div id="qa-success" class="hidden flex flex-col items-center p-4 bg-green-900/80 rounded border border-green-500 w-full max-w-3xl">
+                                <i data-lucide="medal" class="w-20 h-20 text-yellow-400 mb-2"></i>
+                                <span class="text-3xl font-black text-yellow-400">答對了！</span>
+                             </div>
+                             <div id="qa-fail" class="hidden p-4 bg-red-900/80 rounded border border-red-500 w-full max-w-3xl">
+                                <p class="text-gray-300">正確答案</p>
+                                ${answerDisplayHtml}
+                             </div>
+                        </div>
+                    </div>
+                `;
+            }
+            // E/F: 經典/本土/加碼
+            else {
+                const isF = card.col === 5;
+                const data = CLASSIC_QA_ANSWERS[`${isF ? 'F' : 'E'}${card.row}`] || {};
+                const color = isF ? 'yellow' : 'indigo';
+                const textColor = isF ? 'text-yellow-400' : 'text-indigo-400';
+                const borderColor = isF ? 'border-yellow-500' : 'border-indigo-500';
+                const bgColor = isF ? 'bg-yellow-900/40' : 'bg-indigo-900/40';
+                
+                let mediaHtml = '';
+                if (data.type === 'audio-line') {
+                    mediaHtml = `<audio id="active-audio" controls autoplay src="${data.audio}" class="w-full max-w-md my-4"></audio>`;
+                }
+
+                content = `
+                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                        ${closeBtn}
+                        <h3 class="text-3xl font-bold ${textColor} mb-4">${category.name} - ${label}</h3>
+                        
+                        <div class="bg-gray-900 p-6 rounded-xl border-2 ${borderColor}/50 mb-6 w-full max-w-3xl shadow-xl">
+                            <p class="text-2xl md:text-3xl font-black text-white whitespace-pre-line leading-relaxed mb-4">${data.question || '主持人自由出題'}</p>
+                            ${data.requirement ? `<p class="text-lg font-bold text-red-400 border-t border-gray-700 pt-2">${data.requirement}</p>` : ''}
+                            ${mediaHtml}
+                        </div>
+
+                        <div id="answer-box" class="hidden w-full max-w-3xl ${bgColor} p-6 rounded-lg border ${borderColor} mb-4 animate-expand">
+                            <p class="text-xl text-${color}-200 font-bold mb-2">參考答案</p>
+                            <p class="text-3xl font-bold text-white whitespace-pre-line">${data.answerText || ''}</p>
+                            <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
+                        </div>
+
+                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-${color}-600 hover:bg-${color}-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
+                            <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 揭曉答案
+                        </button>
+                    </div>
+                `;
+            }
+
+            return content;
+        }
+
+        // --- 快問快答 專屬邏輯 (保持不變) ---
+        window.startFastQa = function(btn) {
+            document.getElementById('qa-start-overlay').classList.add('hidden');
+            document.getElementById('qa-interaction-area').classList.remove('hidden');
+            
+            let time = 5;
+            const timerEl = document.getElementById('timer-display');
+            timerEl.innerText = time;
+            
+            clearInterval(fastQATimerInterval);
+            fastQATimerInterval = setInterval(() => {
+                time--;
+                timerEl.innerText = time;
+                if(time <= 2) timerEl.classList.add('text-red-500', 'timer-active');
+                if(time <= 0) {
+                    clearInterval(fastQATimerInterval);
+                    timerEl.classList.remove('timer-active');
+                }
+            }, 1000);
+        }
+
+        window.handleFastQaOption = function(btn, isCorrect) {
+            clearInterval(fastQATimerInterval);
+            document.getElementById('qa-interaction-area').classList.add('hidden');
+            showFastQaResult(isCorrect);
+        }
+
+        window.showFastQaResult = function(isSuccess) {
+            clearInterval(fastQATimerInterval);
+            document.getElementById('qa-result').classList.remove('hidden');
+            document.getElementById('qa-interaction-area').classList.add('hidden');
+            if(isSuccess) {
+                document.getElementById('qa-success').classList.remove('hidden');
+                document.getElementById('qa-success').classList.add('flex');
+                document.getElementById('qa-fail').classList.add('hidden'); // 確保失敗隱藏
+            } else {
+                document.getElementById('qa-fail').classList.remove('hidden');
+                document.getElementById('qa-success').classList.add('hidden'); // 確保成功隱藏
+            }
+        }
+
+        // --- 頁面渲染函式 ---
+        
+        function renderHomePage() {
+            setVideoBackground(VIDEO_URLS.HOME);
+            gameModal.classList.add('hidden'); 
+            
+            // 確保影片初始清晰，遮罩初始透明
+            document.getElementById('video-background').classList.remove('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-60');
+            dimmingOverlay.classList.add('opacity-0');
+            
+            // 隱藏 Menu Modal 的 Home 按鈕
+            modalCloseHomeBtn.classList.add('hidden');
+
+            appContainer.innerHTML = `
+                <!-- Full-screen interactive wrapper -->
+                <div id="home-wrapper" 
+                    class="absolute inset-0 z-10 flex flex-col items-center justify-end p-8">
+                    
+                    <div class="flex-grow w-full"></div> <!-- Pushes the button down -->
+
+                    <!-- 按鈕預設可見，移除 btn-hidden 類 -->
+                    <button id="menu-button" 
+                        onclick="renderMenu()" 
+                        class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white text-lg font-bold rounded-full shadow-2xl border-4 border-white animate-pulse-slow">
+                        選擇遊戲模式
+                    </button>
+                </div>
+            `;
+            
+            lucide.createIcons();
+        }
+
+        function renderMenu() {
+            setVideoBackground(VIDEO_URLS.HOME);
+            
+            // 確保影片變暗
+            document.getElementById('video-background').classList.add('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-0');
+            dimmingOverlay.classList.add('opacity-60');
+
+            // 顯示 Menu Modal 的 Home 按鈕
+            modalCloseHomeBtn.classList.remove('hidden');
+
+            // 替換 Modal wrapper 的樣式以適應菜單 (較小)
+            modalWrapper.classList.remove('max-w-2xl', 'max-w-md', 'border-yellow-400');
+            modalWrapper.classList.add('max-w-lg', 'border-red-600');
+
+            // 顯示 Modal
+            gameModal.classList.remove('hidden');
+            setTimeout(() => {
+                modalWrapper.classList.remove('scale-95', 'opacity-0');
+                modalWrapper.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            modalContent.innerHTML = `
+                <div class="space-y-4 p-6 pt-10">
+                    <h3 class="text-4xl font-bold text-center text-white text-shadow mb-4">選擇遊戲模式</h3>
+                    <!-- 導向新的紅色球步驟流程 -->
+                    <button onclick="navigateTo(() => renderRedBallTutorialSteps(0))" class="w-full p-6 bg-red-600 hover:bg-red-700 rounded-lg flex items-center justify-center space-x-4 transition transform hover:scale-105 shadow-xl">
+                        <span class="text-5xl">🔴</span>
+                        <div class="text-left">
+                            <div class="text-2xl font-black">紅白拳王爭霸戰</div>
+                            <div class="text-sm opacity-80">動作教學 & 規則說明</div>
+                        </div>
+                    </button>
+                    <!-- 導向白色球步驟流程 -->
+                    <button onclick="navigateTo(() => renderWhiteBallTutorialSteps(0))" class="w-full p-6 bg-white hover:bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center space-x-4 transition transform hover:scale-105 shadow-xl">
+                        <span class="text-5xl">⚪</span>
+                        <div class="text-left">
+                            <div class="text-2xl font-black">紅白大歌星</div>
+                            <div class="text-sm opacity-80">搶答模式 & 遊戲流程</div>
+                        </div>
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+        
+        function navigateTo(renderer) {
+            // 隱藏 Menu Modal 的 Home 按鈕
+            modalCloseHomeBtn.classList.add('hidden');
+            
+            // 隱藏 Modal (帶動畫)
+            modalWrapper.classList.remove('scale-100', 'opacity-100');
+            modalWrapper.classList.add('scale-95', 'opacity-0');
+
+            appContainer.style.opacity = '0';
+            setTimeout(() => {
+                gameModal.classList.add('hidden'); // 完全隱藏 Modal
+                
+                // 恢復 Modal wrapper 樣式為題目卡片模式 (較大，這是預設)
+                modalWrapper.classList.remove('max-w-lg', 'max-w-md', 'border-red-600');
+                modalWrapper.classList.add('max-w-2xl', 'border-yellow-400');
+
+                renderer();
+                appContainer.style.opacity = '1';
+                lucide.createIcons();
+            }, 300);
+        }
+
+        /**
+         * 處理紅色球步驟導航：切換當前步驟並重新渲染
+         * @param {number} direction - 1 for next, -1 for previous
+         */
+        window.changeRedStep = function(direction) {
+            const newStep = currentRedStep + direction;
+            if (newStep >= 0 && newStep < RED_BALL_STEPS.length) {
+                renderRedBallTutorialSteps(newStep);
+            } else if (newStep >= RED_BALL_STEPS.length) {
+                 // 最後一步按「下一步」則導向動作教學板
+                navigateTo(renderRedBallActionTutorial); 
+            }
+        }
+        
+        /**
+         * 渲染紅色球步驟引導卡片 (紅白拳王爭霸戰)
+         * @param {number} stepIndex - 要顯示的步驟索引 (0-based)
+         */
+        window.renderRedBallTutorialSteps = function(stepIndex) {
+            setVideoBackground(VIDEO_URLS.GAME);
+            
+            // 確保遊戲模式下影片變暗
+            document.getElementById('video-background').classList.add('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-0');
+            dimmingOverlay.classList.add('opacity-60');
+
+            currentRedStep = stepIndex; // 更新追蹤變數
+
+            const step = RED_BALL_STEPS[currentRedStep];
+            const totalSteps = RED_BALL_STEPS.length;
+            
+            const prevDisabled = currentRedStep === 0;
+            // 最後一步按鈕變成 "開始動作教學"
+            const nextButtonText = currentRedStep === totalSteps - 1 ? '開始動作教學' : '下一步';
+            const nextButtonIcon = currentRedStep === totalSteps - 1 ? 'hand-metal' : 'arrow-right';
+            const nextButtonColor = currentRedStep === totalSteps - 1 ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-500 hover:bg-yellow-400 text-gray-900';
+
+
+            appContainer.innerHTML = `
+                <div class="w-full max-w-lg md:max-w-xl mx-auto flex flex-col items-center justify-center py-10 min-h-screen relative">
+                    
+                    <!-- 新增：返回首頁按鈕 -->
+                    <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span>首頁</span>
+                    </button>
+                    
+                    <!-- 步驟導覽卡片 (符合截圖主體) -->
+                    <div class="w-full bg-gray-800/90 rounded-xl shadow-2xl p-8 border border-gray-700 mb-8 flex flex-col items-center transition transform pulse-once">
+                        
+                        <!-- 頂部資訊 -->
+                        <div class="text-center mb-8">
+                            <div class="flex items-center justify-center text-gray-300 mb-2">
+                                <i data-lucide="disc" class="w-4 h-4 mr-2 text-white"></i>
+                                <span class="text-xl font-bold">遊戲流程說明 (${currentRedStep + 1}/${totalSteps})</span>
+                            </div>
+                            <h2 class="text-lg font-semibold text-red-400">
+                                紅白拳王爭霸戰
+                            </h2>
+                        </div>
+
+                        <!-- 步驟內容卡片 (更深色背景) -->
+                        <div class="w-full bg-gray-900/70 p-8 rounded-lg mb-8 shadow-xl">
+                            <h3 class="text-3xl font-black text-red-500 mb-4 text-center">
+                                Step ${currentRedStep + 1} | ${step.title}
+                            </h3>
+                            <p class="text-lg text-gray-300 text-center whitespace-pre-line">${step.description}</p>
+                        </div>
+
+                        <!-- 導航按鈕 -->
+                        <div class="flex justify-center space-x-4 w-full">
+                            <!-- 上一步按鈕 -->
+                            <button 
+                                onclick="changeRedStep(-1)" 
+                                class="flex-1 max-w-[150px] px-6 py-3 rounded-full font-bold transition transform ${prevDisabled ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-600 text-white hover:scale-105'}"
+                                ${prevDisabled ? 'disabled' : ''}>
+                                <i data-lucide="arrow-left" class="w-4 h-4 inline-block mr-1"></i> 上一步
+                            </button>
+                            
+                            <!-- 下一步按鈕 -->
+                            <button 
+                                onclick="changeRedStep(1)" 
+                                class="flex-1 max-w-[150px] px-6 py-3 rounded-full font-bold transition transform hover:scale-105 ${nextButtonColor}">
+                                <i data-lucide="${nextButtonIcon}" class="w-4 h-4 inline-block mr-1"></i> ${nextButtonText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        /**
+         * 處理動作教學卡片的翻轉
+         * @param {number} id - 動作的 ID (100, 101, 102)
+         */
+        window.flipActionCard = function(id) {
+            const cardEl = document.getElementById(`action-card-${id}`);
+            if (cardEl) {
+                cardEl.classList.toggle('is-flipped');
+            }
+        }
+
+        /**
+         * 渲染紅白拳王爭霸戰的動作教學板 (根據使用者圖片設計)
+         */
+        window.renderRedBallActionTutorial = function() {
+            setVideoBackground(VIDEO_URLS.GAME);
+            
+            // 確保遊戲模式下影片變暗
+            document.getElementById('video-background').classList.add('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-0');
+            dimmingOverlay.classList.add('opacity-60');
+
+            // 根據 PUNCH_KING_ACTIONS 資料生成卡片 HTML
+            const actionCardsHtml = PUNCH_KING_ACTIONS.map((action, index) => {
+                // 根據陣營設定顏色
+                // 注意：這裡 'white' 的 card-front 顏色是 bg-white text-gray-900，要和 'red' 區分
+                const bg = action.color === 'red' ? 'bg-red-600' : (action.color === 'white' ? 'bg-white text-gray-900' : 'bg-yellow-500 text-gray-900');
+                const border = action.color === 'red' ? 'border-red-400' : (action.color === 'white' ? 'border-gray-400' : 'border-yellow-400');
+                
+                return `
+                    <div id="action-card-${action.id}" class="card-container h-[400px]" onclick="flipActionCard(${action.id})">
+                        <!-- Front Face: Name and Flip Button -->
+                        <div class="card-face card-front ${bg} p-6 border-4 ${border} hover:shadow-2xl">
+                            <span class="text-8xl">${action.emoji}</span>
+                            <div class="mt-6 text-center">
+                                <p class="text-4xl font-black">${action.name}</p>
+                                <button class="mt-4 px-4 py-2 bg-black/30 rounded-full font-bold transition text-white hover:bg-black/50">
+                                    點擊翻牌
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Back Face: Image and Instruction (已優化為直式佈局) -->
+                        <div class="card-face card-back bg-gray-900/90 p-4 border-4 ${border} overflow-hidden">
+                            <div class="flex flex-col items-center justify-start w-full h-full text-center py-2">
+                                <img src="${action.actionImage}" 
+                                     class="w-full h-auto max-h-64 object-contain rounded-lg border-2 ${border} mb-4 shadow-lg" 
+                                     alt="動作示範圖: ${action.name}"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/200x300/4B5563/ffffff?text=直式圖片載入失敗'">
+                                
+                                <div class="p-2 w-full text-center border-t border-gray-700 pt-3 flex-1 flex items-center justify-center">
+                                    <!-- 簡化為一句話 -->
+                                    <p class="text-lg font-semibold text-white">${action.instruction}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            appContainer.innerHTML = `
+                <div class="w-full flex flex-col items-center py-10 relative min-h-screen">
+                    
+                    <!-- 新增：返回首頁按鈕 -->
+                    <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span>首頁</span>
+                    </button>
+                    
+                    <!-- 拳王動作教學 標題 -->
+                    <div class="bg-black/80 rounded-full px-6 py-3 mb-10 shadow-2xl flex items-center animate-bounce-slow">
+                        <span class="text-3xl font-black text-white flex items-center">
+                            <span class="text-red-500 text-6xl mr-3 leading-none">🔴</span> 拳王動作教學
+                        </span>
+                    </div>
+
+                    <!-- 三張動作卡片 (使用 sm:grid-cols-3 確保手機上直列，桌面橫列) -->
+                    <div class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-3 gap-6 px-4 mb-12">
+                        ${actionCardsHtml}
+                    </div>
+
+                    <!-- 底部導航 (放在卡片下方，不會遮擋) -->
+                    <div class="mt-4 flex space-x-4">
+                        <button onclick="navigateTo(() => renderRedBallTutorialSteps(${RED_BALL_STEPS.length - 1}))" class="px-6 py-3 bg-gray-700/50 hover:bg-gray-700 text-white rounded-full text-lg border border-gray-600 transition transform hover:scale-105">
+                            <i data-lucide="arrow-left" class="w-5 h-5 inline-block mr-2"></i> 返回流程說明
+                        </button>
+                        <!-- 移除多餘的返回選單按鈕 -->
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+
+        /**
+         * 處理白色球步驟導航：切換當前步驟並重新渲染
+         * @param {number} direction - 1 for next, -1 for previous
+         */
+        window.changeWhiteStep = function(direction) {
+            const newStep = currentWhiteStep + direction;
+            if (newStep >= 0 && newStep < WHITE_BALL_STEPS.length) {
+                renderWhiteBallTutorialSteps(newStep);
+            } else if (newStep >= WHITE_BALL_STEPS.length) {
+                // 最後一步按「下一步」則導向主板
+                navigateTo(renderWhiteBallBoard);
+            }
+        }
+
+        /**
+         * 渲染白色球步驟引導卡片 (紅白大歌星)
+         * @param {number} stepIndex - 要顯示的步驟索引 (0-based)
+         */
+        window.renderWhiteBallTutorialSteps = function(stepIndex) {
+            setVideoBackground(VIDEO_URLS.GAME);
+            
+            // 確保遊戲模式下影片變暗
+            document.getElementById('video-background').classList.add('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-0');
+            dimmingOverlay.classList.add('opacity-60');
+
+            currentWhiteStep = stepIndex;
+
+            const step = WHITE_BALL_STEPS[currentWhiteStep];
+            const totalSteps = WHITE_BALL_STEPS.length;
+            
+            const prevDisabled = currentWhiteStep === 0;
+            // 最後一步按鈕變成 "開始遊戲"
+            const nextButtonText = currentWhiteStep === totalSteps - 1 ? '開始遊戲' : '下一步';
+            const nextButtonIcon = currentWhiteStep === totalSteps - 1 ? 'play' : 'arrow-right';
+            const nextButtonColor = currentWhiteStep === totalSteps - 1 ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-500 hover:bg-yellow-400 text-gray-900';
+
+
+            appContainer.innerHTML = `
+                <div class="w-full max-w-lg md:max-w-xl mx-auto flex flex-col items-center justify-center py-10 min-h-screen relative">
+                    
+                    <!-- 新增：返回首頁按鈕 -->
+                    <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span>首頁</span>
+                    </button>
+                    
+                    <!-- 步驟導覽卡片 (符合截圖主體) -->
+                    <div class="w-full bg-gray-800/90 rounded-xl shadow-2xl p-8 border border-gray-700 mb-8 flex flex-col items-center transition transform pulse-once">
+                        
+                        <!-- 頂部資訊 -->
+                        <div class="text-center mb-8">
+                            <div class="flex items-center justify-center text-gray-300 mb-2">
+                                <i data-lucide="disc" class="w-4 h-4 mr-2 text-white"></i>
+                                <span class="text-xl font-bold">遊戲流程說明 (${currentWhiteStep + 1}/${totalSteps})</span>
+                            </div>
+                            <h2 class="text-lg font-semibold text-red-400">
+                                紅白大歌星 (搶答模式)
+                            </h2>
+                        </div>
+
+                        <!-- 步驟內容卡片 (更深色背景，符合截圖中的內層卡片) -->
+                        <div class="w-full bg-gray-900/70 p-8 rounded-lg mb-8 shadow-xl">
+                            <h3 class="text-3xl font-black text-yellow-500 mb-4 text-center">
+                                Step ${currentWhiteStep + 1} | ${step.title}
+                            </h3>
+                            <p class="text-lg text-gray-300 text-center whitespace-pre-line">${step.description}</p>
+                        </div>
+
+                        <!-- 導航按鈕 -->
+                        <div class="flex justify-center space-x-4 w-full">
+                            <!-- 上一步按鈕 -->
+                            <button 
+                                onclick="changeWhiteStep(-1)" 
+                                class="flex-1 max-w-[150px] px-6 py-3 rounded-full font-bold transition transform ${prevDisabled ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gray-700 hover:bg-gray-600 text-white hover:scale-105'}"
+                                ${prevDisabled ? 'disabled' : ''}>
+                                <i data-lucide="arrow-left" class="w-4 h-4 inline-block mr-1"></i> 上一步
+                            </button>
+                            
+                            <!-- 下一步按鈕 -->
+                            <button 
+                                onclick="changeWhiteStep(1)" 
+                                class="flex-1 max-w-[150px] px-6 py-3 rounded-full font-bold transition transform hover:scale-105 ${nextButtonColor}">
+                                <i data-lucide="${nextButtonIcon}" class="w-4 h-4 inline-block mr-1"></i> ${nextButtonText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+
+        // 紅白大歌星 遊戲主板 (已更新 Home 按鈕樣式)
+        function renderWhiteBallBoard() {
+            setVideoBackground(VIDEO_URLS.GAME);
+            
+            // 確保遊戲模式下影片變暗
+            document.getElementById('video-background').classList.add('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-0');
+            dimmingOverlay.classList.add('opacity-60');
+
+            // 生成卡片資料
+            cardData = [];
+            let idCounter = 1;
+            for (let col = 0; col < CATEGORY_COLORS.length; col++) {
+                for (let row = 0; row < ROW_COUNT; row++) {
+                    cardData.push({ 
+                        id: idCounter++, 
+                        col, 
+                        row, 
+                        isFlipped: false 
+                    });
+                }
+            }
+            
+            let gridHtml = '';
+            
+            // 1. Header (佔用 6 個欄位)
+            gridHtml += CATEGORY_COLORS.map(cat => `
+                <div class="category-column-header-cell ${cat.header_bg} ${cat.text} shadow-lg border-b-4 border-black/20">
+                    <div class="flex flex-col items-center">
+                        <i data-lucide="${cat.icon}" class="w-4 h-4 mb-0.5"></i>
+                        <span>${cat.name}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // 2. Cards (6 x 5 = 30 張)
+            for (let row = 0; row < ROW_COUNT; row++) {
+                for (let col = 0; col < CATEGORY_COLORS.length; col++) {
+                    const card = cardData.find(c => c.col === col && c.row === row);
+                    const cat = CATEGORY_COLORS[col];
+                    const label = `${CATEGORY_LETTERS[col]}${row + 1}`;
+
+                    // Grid Item: 佔用 1 欄位
+                    gridHtml += `
+                        <div id="card-${card.id}" class="card-container" onclick="flipCard(${card.id})">
+                            <div class="card-face card-front ${cat.bg} ${cat.text} hover:${cat.hover} transition duration-300">
+                                <span class="text-3xl font-black drop-shadow-md">${label}</span>
+                            </div>
+                            <div class="card-face card-back">
+                                <i data-lucide="check" class="w-8 h-8 text-green-400"></i>
+                                <span class="text-xs font-bold text-green-400 mt-1">Done</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+
+            appContainer.innerHTML = `
+                <div class="w-full flex flex-col items-center max-w-7xl pt-4 px-2 relative"> <!-- 加上 relative 讓 Home 按鈕定位 -->
+                    <!-- Home button fixed to the top right of the container (使用新的樣式) -->
+                    <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span>首頁</span>
+                    </button>
+                    
+                    <!-- Centered Title (新風格) -->
+                    <div class="bg-black/80 rounded-full px-8 py-3 mb-6 shadow-2xl flex items-center animate-bounce-slow">
+                        <span class="text-4xl font-black text-white flex items-center">
+                            <span class="text-red-500 text-6xl mr-3 leading-none">⚪</span> 紅白大歌星
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-300 text-sm mb-3 text-shadow text-center">
+                        遊戲卡片主板：30 張卡片已完整呈現於畫面中。
+                    </p>
+
+                    <div id="game-board-grid" class="mb-4">
+                        ${gridHtml}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // 啟動: 變更為先渲染首頁
+        window.onload = renderHomePage;
+
+    </script>
+</body>
+</html>
