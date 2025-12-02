@@ -292,7 +292,7 @@
             { name: "題目 A5", song: "戀愛ing", artist: "五月天", audio: "https://lochoive-code.github.io/redwhitegames/a5-love-ing.mp3" },
         ];
         
-        // B 類別：新增 audio 欄位
+        // B 類別：新增 audio 欄位 (已包含音樂連結)
         const GAP_FILL_ANSWERS = [
             { name: "B1", question: "原來你是我最想留住的幸運...", answer: "原來我們和愛情曾經靠得那麼近", hint: "★★★★★★★★★★★★★★ (14 字)", from: "田馥甄《小幸運》", audio: "https://lochoive-code.github.io/redwhitegames/b1-lucky.mp3" },
             { name: "B2", question: "心甘情願感染你的氣息...", answer: "我愛你有幾分", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
@@ -338,15 +338,15 @@
                 answerText: "灌籃高手", 
                 answerImage: "https://lochoive-code.github.io/redwhitegames/c3-ans-pic.png"
             },
-            // C4: 斯斯感冒膠囊 (Image Question, Audio Answer)
+            // C4: 斯斯感冒膠囊 (Image Question, Video Answer) <-- 已更新為 Video
             { 
                 name: "C4", 
                 type: "image", 
                 question: "請問《斯斯感冒膠囊》廣告主題曲是哪位歌手唱的？", 
                 image: "https://lochoive-code.github.io/redwhitegames/c4-question-pic.png", 
-                answerType: "audio", 
-                answerText: "羅時豐", 
-                answerAudio: "https://lochoive-code.github.io/redwhitegames/c4-luoshifeng.mp3" // 音訊答案 Placeholder
+                answerType: "video", 
+                answerText: "羅時豐 / 斯斯感冒膠囊廣告", 
+                answerVideo: "https://lochoive-code.github.io/redwhitegames/c4-ans-video.mp4" // 影片答案 Placeholder
             },
             // C5: 電視劇主題曲 (Audio Question, Image Answer)
             { 
@@ -404,6 +404,7 @@
         }
 
         window.stopAllAudio = function() {
+            // 確保停止所有音訊和影片（除了背景影片）
             document.querySelectorAll('audio, video').forEach(el => {
                 if(el.id !== 'video-background') { el.pause(); el.currentTime = 0; }
             });
@@ -526,7 +527,7 @@
                     </div>
                 `;
             }
-            // B: 歌詞填空 (取消自動播放)
+            // B: 歌詞填空 (將音訊移至問題區)
             else if (card.col === 1) {
                 const data = GAP_FILL_ANSWERS[card.row] || {};
                 content = `
@@ -538,16 +539,22 @@
                             <p class="text-xl text-yellow-300 mb-3"><i data-lucide="pencil" class="inline w-5 h-5 mr-1"></i> 接出下一句歌詞</p>
                             <p class="text-2xl md:text-4xl font-black text-white leading-relaxed mb-4">${data.question || '資料遺失'}</p>
                             <p class="text-xl font-bold text-red-400">${data.hint || ''}</p>
+                            
+                            <!-- B 類別音訊：已移至問題區，供點擊播放回想 -->
+                            <div class="mt-4 w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
+                                <p class="text-sm text-blue-300 mb-2 flex items-center justify-center">
+                                    <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放音訊輔助回想
+                                </p>
+                                <!-- 移除 autoplay -->
+                                <audio id="question-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
+                            </div>
+                            <!-- 結束 B 類別音訊 -->
                         </div>
 
                         <div id="answer-box" class="hidden w-full max-w-3xl bg-blue-900/40 p-6 rounded-lg border border-blue-500 mb-4 animate-expand">
                             <p class="text-3xl font-bold text-white">${data.answer || ''}</p>
                             <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
-                            
-                            <div class="mt-4 w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
-                                <p class="text-sm text-blue-300 mb-2 flex items-center justify-center"><i data-lucide="music" class="w-4 h-4 mr-1"></i> 答案試聽</p>
-                                <audio id="answer-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
-                            </div>
+                            <!-- 移除原本答案區塊的音訊 -->
                         </div>
 
                         <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
@@ -590,7 +597,7 @@
                 // --- 2. 處理答案媒體 (Video / Image / Audio / Text) ---
                 let answerHtml = '';
                 if(data.answerType === 'video') {
-                    // 影片答案 (C1, C2)
+                    // 影片答案 (C1, C2, C4)
                     answerHtml = `
                         <p class="text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
                         <div class="video-container">
@@ -608,7 +615,7 @@
                             alt="答案圖片">
                     `;
                 } else if (data.answerType === 'audio') {
-                    // 音樂答案 (C4)
+                    // 音樂答案 (Fallback, C4 已被移除)
                     answerHtml = `
                         <p class="text-2xl font-bold text-white mb-3">歌手：${data.answerText || '音樂答案'}</p>
                         <p class="text-sm text-yellow-500 mb-2">請點擊播放音檔</p>
