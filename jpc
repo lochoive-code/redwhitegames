@@ -323,7 +323,7 @@
                 name: "C2", 
                 type: "audio", 
                 question: "請問這首歌是哪個產品的廣告歌？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-music.mp3", // 音訊 Placeholder
+                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-music", // 音訊 Placeholder
                 answerType: "video", 
                 answerText: "黑人牙膏",
                 answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" // 影片答案 Placeholder
@@ -353,7 +353,7 @@
                 name: "C5", 
                 type: "audio", 
                 question: "請問這首歌是哪部電視劇的主題曲？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c5-quetion-mucis.mp3", // 音訊 Placeholder
+                audio: "https://lochoive-code.github.io/redwhitegames/c5-quetion-mucis", // 音訊 Placeholder
                 answerType: "image", 
                 answerText: "飛龍在天", 
                 answerImage: "https://lochoive-code.github.io/redwhitegames/c5-question-pic.jpeg"
@@ -500,7 +500,7 @@
             const category = CATEGORY_COLORS[card.col];
             const label = `${CATEGORY_LETTERS[card.col]}${card.row + 1}`;
 
-            // A: 音樂題
+            // A: 音樂題 (A1-A5) - **已修改為自動播放**
             if (card.col === 0) {
                 const data = MUSIC_ANSWERS[card.row] || {};
                 content = `
@@ -510,9 +510,9 @@
                         <p class="text-lg text-gray-300 mb-6">請聆聽音樂並回答歌名與歌手</p>
                         
                         <div class="w-full max-w-lg bg-gray-900 p-4 rounded-xl border border-red-500/30 mb-6 shadow-xl">
-                            <!-- 移除 autoplay -->
-                            <audio id="active-audio" controls src="${data.audio}" class="w-full mb-2"></audio>
-                            <p class="text-xs text-yellow-500">🔊 請手動點擊播放</p>
+                            <!-- 已新增 autoplay 屬性以自動播放 -->
+                            <audio id="active-audio" controls autoplay src="${data.audio}" class="w-full mb-2"></audio>
+                            <p class="text-xs text-yellow-500">🔊 音樂已自動播放，若未播放請手動點擊</p>
                         </div>
 
                         <div id="answer-box" class="hidden w-full max-w-lg bg-red-900/40 p-4 rounded-lg border border-red-500 mb-4 animate-expand">
@@ -527,7 +527,7 @@
                     </div>
                 `;
             }
-            // B: 歌詞填空 (將音訊移至問題區)
+            // B: 歌詞填空 (保持手動播放)
             else if (card.col === 1) {
                 const data = GAP_FILL_ANSWERS[card.row] || {};
                 content = `
@@ -540,12 +540,11 @@
                             <p class="text-2xl md:text-4xl font-black text-white leading-relaxed mb-4">${data.question || '資料遺失'}</p>
                             <p class="text-xl font-bold text-red-400">${data.hint || ''}</p>
                             
-                            <!-- B 類別音訊：已移至問題區，供點擊播放回想 -->
+                            <!-- B 類別音訊：保持手動播放 -->
                             <div class="mt-4 w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
                                 <p class="text-sm text-blue-300 mb-2 flex items-center justify-center">
                                     <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放音訊輔助回想
                                 </p>
-                                <!-- 移除 autoplay -->
                                 <audio id="question-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
                             </div>
                             <!-- 結束 B 類別音訊 -->
@@ -554,7 +553,6 @@
                         <div id="answer-box" class="hidden w-full max-w-3xl bg-blue-900/40 p-6 rounded-lg border border-blue-500 mb-4 animate-expand">
                             <p class="text-3xl font-bold text-white">${data.answer || ''}</p>
                             <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
-                            <!-- 移除原本答案區塊的音訊 -->
                         </div>
 
                         <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
@@ -563,7 +561,7 @@
                     </div>
                 `;
             }
-            // C: 主題/廣告歌 (已更新邏輯)
+            // C: 主題/廣告歌 (保持手動播放)
             else if (card.col === 2) {
                 const data = THEME_SONG_ANSWERS[card.row] || {};
                 let mediaHtml = '';
@@ -585,7 +583,7 @@
                         </div>
                     `;
                 } else if (data.type === 'audio') {
-                    // 移除 autoplay
+                    // C 類別音訊：保持手動播放
                     mediaHtml = `
                         <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
                             <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
@@ -597,11 +595,10 @@
                 // --- 2. 處理答案媒體 (Video / Image / Audio / Text) ---
                 let answerHtml = '';
                 if(data.answerType === 'video') {
-                    // 影片答案 (C1, C2, C4)
+                    // 影片答案 (C1, C2, C4) - 保持手動播放
                     answerHtml = `
                         <p class="text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
                         <div class="video-container">
-                            <!-- 移除 autoplay -->
                             <video id="ans-video" controls src="${data.answerVideo}" class="w-full rounded-lg"></video>
                         </div>
                         <p class="text-sm text-green-300 mt-2">請點擊播放觀看答案影片</p>
@@ -615,7 +612,7 @@
                             alt="答案圖片">
                     `;
                 } else if (data.answerType === 'audio') {
-                    // 音樂答案 (Fallback, C4 已被移除)
+                    // 音樂答案 (Fallback, C4 已被移除) - 保持手動播放
                     answerHtml = `
                         <p class="text-2xl font-bold text-white mb-3">歌手：${data.answerText || '音樂答案'}</p>
                         <p class="text-sm text-yellow-500 mb-2">請點擊播放音檔</p>
@@ -647,7 +644,7 @@
                     </div>
                 `;
             }
-            // D: 快問快答
+            // D: 快問快答 (無音訊)
             else if (card.col === 3) {
                 const data = FAST_QA_ANSWERS[card.row] || {};
                 let interactionAreaContent = '';
@@ -720,7 +717,7 @@
                     </div>
                 `;
             }
-            // E/F: 經典/本土/加碼
+            // E/F: 經典/本土/加碼 (保持手動播放)
             else {
                 const isF = card.col === 5;
                 const data = CLASSIC_QA_ANSWERS[`${isF ? 'F' : 'E'}${card.row}`] || {};
@@ -731,7 +728,7 @@
                 
                 let mediaHtml = '';
                 if (data.type === 'audio-line') {
-                    // 移除 autoplay
+                    // E/F 類別音訊：保持手動播放
                     mediaHtml = `
                         <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
                             <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
