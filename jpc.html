@@ -248,7 +248,7 @@
                 id: 101,
                 name: "剪刀", 
                 emoji: "✌️", 
-                instruction: "雙手比剪刀，代表 <span class='text-red-400 font-black'>'紅' 隊</span> 陣營！", // Simplified single sentence
+                instruction: "雙手交叉比成「X」形，像兩把剪刀交疊。", 
                 color: "red", // 紅隊
                 actionImage: "https://lochoive-code.github.io/redwhitegames/scissors.png" // Vertical photo placeholder
             },
@@ -256,7 +256,7 @@
                 id: 100, 
                 name: "石頭", 
                 emoji: "👊", 
-                instruction: "雙手握拳頭，代表 <span class='text-white font-black'>'白' 隊</span> 陣營！", // Simplified single sentence
+                instruction: "雙手握拳比「O」形，像圓圓的石頭。", // Simplified single sentence
                 color: "white", // 白隊
                 actionImage: "https://lochoive-code.github.io/redwhitegames/stone.png" // Vertical photo placeholder
             },
@@ -264,7 +264,7 @@
                 id: 102,
                 name: "布", 
                 emoji: "🖐️", 
-                instruction: "雙手張開成布，多用於 <span class='text-yellow-400 font-black'>'和局' 或 '特殊指令'</span>。", 
+                instruction: "雙手完全張開，手掌攤平。", 
                 color: "yellow",
                 actionImage: "https://lochoive-code.github.io/redwhitegames/cloth.png" // Vertical photo placeholder
             }
@@ -285,27 +285,79 @@
 
         // --- 題目資料庫 ---
         const MUSIC_ANSWERS = [
-            { name: "題目 A1", song: "Love Story", artist: "Taylor Swift", audio: "https://lochoive-code.github.io/redwhitegames/love-story-q.mp3" },
-            { name: "題目 A2", song: "隱形的翅膀", artist: "張韶涵", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "題目 A3", song: "小幸運", artist: "田馥甄", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-            { name: "題目 A4", song: "告白氣球", artist: "周杰倫", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-            { name: "題目 A5", song: "三天三夜", artist: "張惠妹", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+            { name: "題目 A1", song: "Love Story", artist: "Taylor Swift", audio: "https://lochoive-code.github.io/redwhitegames/a1-love-story.mp3" },
+            { name: "題目 A2", song: "隱形的翅膀", artist: "張韶涵", audio: "https://lochoive-code.github.io/redwhitegames/a2-wings.mp3" },
+            { name: "題目 A3", song: "我是一隻小小鳥", artist: "趙傳", audio: "https://lochoive-code.github.io/redwhitegames/a3-birdy.mp3" },
+            { name: "題目 A4", song: "Rolling in the deep", artist: "Adele", audio: "https://lochoive-code.github.io/redwhitegames/a4-Rolling-in-the-deep.mp3" },
+            { name: "題目 A5", song: "戀愛ing", artist: "五月天", audio: "https://lochoive-code.github.io/redwhitegames/a5-love-ing.mp3" },
         ];
         
+        // B 類別：新增 audio 欄位
         const GAP_FILL_ANSWERS = [
-            { name: "B1", question: "原來你是我最想留住的幸運...", answer: "原來我們和愛情曾經靠得那麼近", hint: "★★★★★★★★★★★★★★ (14 字)", from: "田馥甄《小幸運》" },
-            { name: "B2", question: "你問我愛你有多深...", answer: "我愛你有幾分", hint: "★★★★★★★★ (8 字)", from: "鄧麗君《月亮代表代表我的心》" },
-            { name: "B3", question: "對面的女孩看過來...", answer: "這裡的表演很精彩", hint: "★★★★★★★★ (8 字)", from: "任賢齊《對面的女孩看過來》" },
-            { name: "B4", question: "原諒我這一生不羈放縱愛自由...", answer: "也會怕有一天會跌倒", hint: "★★★★★★★★★ (9 字)", from: "Beyond《海闊天空》" },
-            { name: "B5", question: "我們一起學貓叫...", answer: "一起喵喵喵喵喵", hint: "★★★★★★★ (7 字)", from: "小潘潘 / 小峰峰《學貓叫》" }
+            { name: "B1", question: "原來你是我最想留住的幸運...", answer: "原來我們和愛情曾經靠得那麼近", hint: "★★★★★★★★★★★★★★ (14 字)", from: "田馥甄《小幸運》", audio: "https://lochoive-code.github.io/redwhitegames/b1-lucky.mp3" },
+            { name: "B2", question: "心甘情願感染你的氣息...", answer: "我愛你有幾分", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
+            { name: "B3", question: "背棄了理想，誰人都可以", answer: "哪會怕有一天只你共我", hint: "★★★★★★★★★★ (10 字)", from: "Beyond《海闊天空》", audio: "https://lochoive-code.github.io/redwhitegames/b3-hksong.mp3" },
+            { name: "B4", question: "若分開...", answer: "已經不知何時何日才會通甲你來相逢", hint: "★★★★★★★★★★★★★★★★ (16 字)", from: "郭桂彬與黃乙玲《海波浪》", audio: "https://lochoive-code.github.io/redwhitegames/b4-wave.mp3" },
+            { name: "B5", question: "我們一起學貓叫...", answer: "一起喵喵喵喵喵", hint: "★★★★★★★ (7 字)", from: "小潘潘 / 小峰峰《學貓叫》", audio: "https://lochoive-code.github.io/redwhitegames/b5-meow.mp3" }
         ];
 
+        // C 類別：已更新為使用者要求內容
         const THEME_SONG_ANSWERS = [
-            { name: "C1", type: "image", question: "這張圖片是哪一部經典偶像劇的主題曲？", image: "https://placehold.co/600x400/7C3AED/ffffff?text=C1+偶像劇+圖片", answerType: "text", answerText: "流星花園 - 情非得已" },
-            { name: "C2", type: "audio", question: "這是哪一支知名廣告歌？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", answerType: "video", answerVideo: "https://www.w3schools.com/tags/movie.mp4" },
-            { name: "C3", type: "audio", question: "這是哪部卡通或動畫的主題曲？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", answerType: "video", answerVideo: "https://www.w3schools.com/html/mov_bbb.mp4" },
-            { name: "C4", type: "image", question: "這張圖片代表的電影主題曲是？", image: "https://placehold.co/600x400/D97706/ffffff?text=C4+電影+圖片", answerType: "text", answerText: "鐵達尼號 - My Heart Will Go On" },
-            { name: "C5", type: "image", question: "這是哪個品牌的經典廣告畫面？", image: "https://placehold.co/600x400/10B981/ffffff?text=C5+品牌+圖片", answerType: "text", answerText: "Nike - Just Do It" }
+            // C1: 倚天屠龍記 (MCQ Image Question, Video Answer)
+            { 
+                name: "C1", 
+                type: "mcq_image", // 問題類型: 圖片搭配多選題
+                question: "請問電視劇《倚天屠龍記》1994年版的片尾曲是？", 
+                image: "https://lochoive-code.github.io/redwhitegames/c1-question-pic.jpg", 
+                mcq_options: [
+                    { text: "A. 追夢人", isCorrect: false },
+                    { text: "B. 愛江山更愛美人", isCorrect: true },
+                    { text: "C. 滄海一聲笑", isCorrect: false }
+                ],
+                answerType: "video", 
+                answerText: "正確答案：B. 愛江山更愛美人",
+                answerVideo: "https://lochoive-code.github.io/redwhitegames/c1-ans-video.mp4" // 影片答案 Placeholder
+            },
+            // C2: 廣告歌 (Audio Question, Video Answer)
+            { 
+                name: "C2", 
+                type: "audio", 
+                question: "請問這首歌是哪個產品的廣告歌？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-music", // 音訊 Placeholder
+                answerType: "video", 
+                answerText: "黑人牙膏",
+                answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" // 影片答案 Placeholder
+            },
+            // C3: 動漫主題曲 (Audio Question, Image Answer)
+            { 
+                name: "C3", 
+                type: "audio", 
+                question: "請問日文歌曲《直到世界的盡頭》是哪部動漫的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/c3-question-music.mp3", // 音訊 Placeholder
+                answerType: "image", 
+                answerText: "灌籃高手", 
+                answerImage: "https://lochoive-code.github.io/redwhitegames/c3-ans-pic.png"
+            },
+            // C4: 斯斯感冒膠囊 (Image Question, Audio Answer)
+            { 
+                name: "C4", 
+                type: "image", 
+                question: "請問《斯斯感冒膠囊》廣告主題曲是哪位歌手唱的？", 
+                image: "https://lochoive-code.github.io/redwhitegames/c4-question-pic.png", 
+                answerType: "audio", 
+                answerText: "羅時豐", 
+                answerAudio: "https://lochoive-code.github.io/redwhitegames/c4-luoshifeng.mp3" // 音訊答案 Placeholder
+            },
+            // C5: 電視劇主題曲 (Audio Question, Image Answer)
+            { 
+                name: "C5", 
+                type: "audio", 
+                question: "請問這首歌是哪部電視劇的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/c5-quetion-mucis", // 音訊 Placeholder
+                answerType: "image", 
+                answerText: "飛龍在天", 
+                answerImage: "https://lochoive-code.github.io/redwhitegames/c5-question-pic.jpeg"
+            }
         ];
 
         const FAST_QA_ANSWERS = [
@@ -457,8 +509,9 @@
                         <p class="text-lg text-gray-300 mb-6">請聆聽音樂並回答歌名與歌手</p>
                         
                         <div class="w-full max-w-lg bg-gray-900 p-4 rounded-xl border border-red-500/30 mb-6 shadow-xl">
-                            <audio id="active-audio" controls autoplay src="${data.audio}" class="w-full mb-2"></audio>
-                            <p class="text-xs text-yellow-500">🔊 若無法自動播放，請手動點擊播放</p>
+                            <!-- 移除 autoplay -->
+                            <audio id="active-audio" controls src="${data.audio}" class="w-full mb-2"></audio>
+                            <p class="text-xs text-yellow-500">🔊 請手動點擊播放</p>
                         </div>
 
                         <div id="answer-box" class="hidden w-full max-w-lg bg-red-900/40 p-4 rounded-lg border border-red-500 mb-4 animate-expand">
@@ -473,7 +526,7 @@
                     </div>
                 `;
             }
-            // B: 歌詞填空
+            // B: 歌詞填空 (取消自動播放)
             else if (card.col === 1) {
                 const data = GAP_FILL_ANSWERS[card.row] || {};
                 content = `
@@ -490,6 +543,11 @@
                         <div id="answer-box" class="hidden w-full max-w-3xl bg-blue-900/40 p-6 rounded-lg border border-blue-500 mb-4 animate-expand">
                             <p class="text-3xl font-bold text-white">${data.answer || ''}</p>
                             <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
+                            
+                            <div class="mt-4 w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
+                                <p class="text-sm text-blue-300 mb-2 flex items-center justify-center"><i data-lucide="music" class="w-4 h-4 mr-1"></i> 答案試聽</p>
+                                <audio id="answer-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
+                            </div>
                         </div>
 
                         <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
@@ -498,25 +556,67 @@
                     </div>
                 `;
             }
-            // C: 主題/廣告歌
+            // C: 主題/廣告歌 (已更新邏輯)
             else if (card.col === 2) {
                 const data = THEME_SONG_ANSWERS[card.row] || {};
                 let mediaHtml = '';
-                if(data.type === 'image') {
-                    mediaHtml = `<img src="${data.image}" class="max-h-64 rounded-lg border border-green-500 mx-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">`;
-                } else {
-                    mediaHtml = `<audio id="active-audio" controls autoplay src="${data.audio}" class="w-full"></audio>`;
-                }
-
-                let answerHtml = '';
-                if(data.answerType === 'video') {
-                    answerHtml = `
-                        <div class="video-container">
-                            <video id="ans-video" controls src="${data.answerVideo}"></video>
+                
+                // --- 1. 處理問題媒體 (Image / Audio / MCQ Image) ---
+                if(data.type === 'image' || data.type === 'mcq_image') {
+                    mediaHtml = `
+                        <div class="flex flex-col items-center">
+                            <img src="${data.image}" class="max-h-64 rounded-lg border border-green-500 mx-auto mb-4" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">
+                            ${data.type === 'mcq_image' ? `
+                                <div class="grid grid-cols-1 gap-3 w-full max-w-sm mt-4">
+                                    ${data.mcq_options.map(opt => `
+                                        <div class="p-3 bg-gray-700 rounded-lg text-lg font-semibold text-white text-center border border-gray-600">
+                                            ${opt.text}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                     `;
+                } else if (data.type === 'audio') {
+                    // 移除 autoplay
+                    mediaHtml = `
+                        <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
+                            <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
+                        </p>
+                        <audio id="active-audio" controls src="${data.audio}" class="w-full"></audio>
+                    `;
+                }
+
+                // --- 2. 處理答案媒體 (Video / Image / Audio / Text) ---
+                let answerHtml = '';
+                if(data.answerType === 'video') {
+                    // 影片答案 (C1, C2)
+                    answerHtml = `
+                        <p class="text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
+                        <div class="video-container">
+                            <!-- 移除 autoplay -->
+                            <video id="ans-video" controls src="${data.answerVideo}" class="w-full rounded-lg"></video>
+                        </div>
+                        <p class="text-sm text-green-300 mt-2">請點擊播放觀看答案影片</p>
+                    `;
+                } else if (data.answerType === 'image') {
+                    // 圖片答案 (C3, C5)
+                    answerHtml = `
+                        <p class="text-2xl font-bold text-white mb-3">${data.answerText || '圖片答案'}</p>
+                        <img src="${data.answerImage}" class="max-h-64 rounded-lg border-4 border-green-500 shadow-xl mx-auto" 
+                            onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗';" 
+                            alt="答案圖片">
+                    `;
+                } else if (data.answerType === 'audio') {
+                    // 音樂答案 (C4)
+                    answerHtml = `
+                        <p class="text-2xl font-bold text-white mb-3">歌手：${data.answerText || '音樂答案'}</p>
+                        <p class="text-sm text-yellow-500 mb-2">請點擊播放音檔</p>
+                        <audio id="ans-audio" controls src="${data.answerAudio}" class="w-full"></audio>
+                    `;
                 } else {
-                    answerHtml = `<p class="text-3xl font-bold text-white">${data.answerText}</p>`;
+                    // 純文字答案 (Fallback)
+                    answerHtml = `<p class="text-3xl font-bold text-white">${data.answerText || '正確答案'}</p>`;
                 }
 
                 content = `
@@ -530,16 +630,17 @@
                         </div>
 
                         <div id="answer-box" class="hidden w-full max-w-3xl bg-green-900/40 p-4 rounded-lg border border-green-500 mb-4 animate-expand">
+                            <p class="text-sm text-green-300 font-bold mb-2">正確答案</p>
                             ${answerHtml}
                         </div>
 
-                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden'); const v=document.getElementById('ans-video'); if(v) v.play();" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
+                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
                             <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 看答案
                         </button>
                     </div>
                 `;
             }
-            // D: 快問快答 (已更新 D2-D5 的圖片答案顯示)
+            // D: 快問快答
             else if (card.col === 3) {
                 const data = FAST_QA_ANSWERS[card.row] || {};
                 let interactionAreaContent = '';
@@ -623,7 +724,13 @@
                 
                 let mediaHtml = '';
                 if (data.type === 'audio-line') {
-                    mediaHtml = `<audio id="active-audio" controls autoplay src="${data.audio}" class="w-full max-w-md my-4"></audio>`;
+                    // 移除 autoplay
+                    mediaHtml = `
+                        <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
+                            <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
+                        </p>
+                        <audio id="active-audio" controls src="${data.audio}" class="w-full max-w-md my-4"></audio>
+                    `;
                 }
 
                 content = `
