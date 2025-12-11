@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>紅白大歌星 - 遊戲流程總覽</title>
+    <title>紅白PLAY翻天</title>
     <!-- 載入 Inter 字體 -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <!-- 載入 Tailwind CSS CDN -->
@@ -250,7 +250,7 @@
                 emoji: "✌️", 
                 instruction: "雙手交叉比成「X」形，像兩把剪刀交疊。", 
                 color: "red", // 紅隊
-                actionImage: "https://lochoive-code.github.io/redwhitegames/scissors.png" // Vertical photo placeholder
+                actionImage: "https://lochoive-code.github.io/redwhitegames/jpc-scissors.png" // Vertical photo placeholder
             },
             { 
                 id: 100, 
@@ -258,7 +258,7 @@
                 emoji: "👊", 
                 instruction: "雙手握拳比「O」形，像圓圓的石頭。", // Simplified single sentence
                 color: "white", // 白隊
-                actionImage: "https://lochoive-code.github.io/redwhitegames/stone.png" // Vertical photo placeholder
+                actionImage: "https://lochoive-code.github.io/redwhitegames/jpc-stone.png" // Vertical photo placeholder
             },
             { 
                 id: 102,
@@ -266,7 +266,7 @@
                 emoji: "🖐️", 
                 instruction: "雙手完全張開，手掌攤平。", 
                 color: "yellow",
-                actionImage: "https://lochoive-code.github.io/redwhitegames/cloth.png" // Vertical photo placeholder
+                actionImage: "https://lochoive-code.github.io/redwhitegames/jpc-cloth.png" // Vertical photo placeholder
             }
         ];
 
@@ -361,29 +361,155 @@
         ];
 
         const FAST_QA_ANSWERS = [
-            // D1 (純文字問答)
-            { type: 'text', question: 'Baby shark, doo doo doo doo doo doo，請接唱下一句！', answer: 'Baby shark, doo doo doo doo doo doo' },
-            // D2 (圖片答案)
-            { type: 'image_answer', question: '請問哪座山是台灣最高的山？ (請指出圖片)', answer: '玉山', answerImage: 'https://placehold.co/600x400/10B981/ffffff?text=D2+台灣高山圖示' },
-            // D3 (圖片答案)
-            { type: 'image_answer', question: '請問白雪公主吃了什麼水果中毒？ (請指出正確圖片)', answer: '毒蘋果', answerImage: 'https://placehold.co/600x400/DC2626/ffffff?text=D3+白雪公主的毒蘋果' },
-            // D4 (圖片答案)
-            { type: 'image_answer', question: '請問這是哪位著名華語歌星？ (請指出圖片)', answer: '周杰倫', answerImage: 'https://placehold.co/600x400/9333EA/ffffff?text=D4+歌星+周杰倫' },
-            // D5 (圖片答案)
-            { type: 'image_answer', question: '請指出哪張圖片代表了「疑是地上霜」的意境？ (請指出圖片)', answer: '月光照地的圖片', answerImage: 'https://placehold.co/600x400/FACC15/000000?text=D5+月光下的霜' }
+            // D1 (圖片題)
+            { 
+                type: 'image_question', 
+                question: '請選出圖片為歌手「周杰倫」的3張照片', 
+                questionImage: 'https://lochoive-code.github.io/redwhitegames/d1-question-jay.png', // 示意圖
+                answer: '周杰倫', 
+                answerImage: 'https://lochoive-code.github.io/redwhitegames/d1-answer-jay.png' // 示意圖
+            },
+            // D2 (音樂題)
+            { 
+                type: 'audio', 
+                question: '請問這首歌是哪位歌手唱的？', 
+                audio: 'https://lochoive-code.github.io/redwhitegames/d2-question-music.mp3', // 音訊 Placeholder 
+                answer: '黃妃' 
+            },
+            // D3 (圖片題 + 文字問答)
+            { 
+                type: 'image_question', 
+                question: '請說出歌手《伍佰》的三首經典歌曲', 
+                questionImage: 'https://lochoive-code.github.io/redwhitegames/d3-question-pic.jpg', // 示意圖
+                answer: '參考答案：\n突然的自我﹑浪人情歌、煞到妳…等等' 
+            },
+            // D4 (圖片題 + 文字問答)
+            { 
+                type: 'image_question', 
+                question: '請舉出三組「台灣」知名音樂團體', 
+                questionImage: 'https://lochoive-code.github.io/redwhitegames/d4-question-pic.png', // 示意圖
+                answer: '參考答案：\n五月天、S.H.E、Energy…等等' 
+            },
+            // D5 (選擇題 + 音樂)
+            { 
+                type: 'mcq', 
+                question: '<Let It Be> 是哪個樂團演唱的經典歌曲？', 
+                audio: 'https://lochoive-code.github.io/redwhitegames/f5-question-music.mp3', // 音訊 Placeholder
+                options: [
+                    { text: 'A：披頭四（The Beatles）', isCorrect: true },
+                    { text: 'B：皇后樂隊（Queen）', isCorrect: false },
+                    { text: 'C：滾石樂隊（Rolling Stones）', isCorrect: false }
+                ],
+                answer: '披頭四（The Beatles）' 
+            }
         ];
         
         const CLASSIC_QA_ANSWERS = {
-            E0: { name: "E1", type: "audio-line", question: "「從我咩到你咩，一共五步」\n請問這句台詞出自哪部電影？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", answerText: "不能說的秘密" },
-            E1: { name: "E2", type: "sing-song", question: "請唱出台語歌曲《一支小雨傘》的歌詞", requirement: "至少唱出 兩句以上", answerText: "一支小雨傘 仔\n予你遮予我蓋", from: "洪榮宏/江蕙" },
-            E2: { name: "E3", type: "sing-song", question: "請唱出台語歌曲《一支小雨傘》的歌詞", requirement: "至少唱出 兩句以上", answerText: "提出小雨傘 遮著你人濟\n不甘來乎你淋著雨水", from: "洪榮宏/江蕙" },
-            E3: { name: "E4", type: "sing-song", question: "請唱出《愛拚才會贏》任一段落", requirement: "至少唱出 兩句以上", answerText: "一時失志不免怨嘆\n一時落魄不免膽寒", from: "葉啟田" },
-            E4: { name: "E5", type: "list-artist", question: "請說出歌手《伍佰》的經典歌曲", requirement: "須回答 三首", answerText: "挪威的森林、浪人情歌、被動", from: "伍佰" },
-            F0: { name: "F1 (我幫你選)", type: "audio-line", question: "《永遠不回頭》是哪部電影的主題曲？", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", answerText: "《七匹狼》 (1989)" },
-            F1: { name: "F2 (我幫你選)", type: "list-artist", question: "請說出《五月天》的經典歌曲", requirement: "須回答 三首", answerText: "倔強、擁抱、突然好想你", from: "五月天" },
-            F2: { name: "F3 (我幫你選)", type: "audio-line", question: "聽前奏猜歌名", audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", answerText: "稻香", from: "周杰倫" },
-            F3: { name: "F4 (我幫你選)", type: "sing-song", question: "請用「啦啦啦」哼唱《童話》副歌", requirement: "哼唱出一段即可", answerText: "光良 - 童話", from: "光良" },
-            F4: { name: "F5 (我幫你選)", type: "list-artist", question: "請列舉 3 首 S.H.E 的歌曲", requirement: "須回答 三首", answerText: "戀人未滿、Super Star、波斯貓", from: "S.H.E" }
+            // E 類別：經典/本土歌 (使用者自定義更新)
+            E0: { 
+                name: "E1", 
+                type: "audio_image", 
+                question: "請問這首歌是哪部電影的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e1-question-music.mp3", 
+                answerText: "七匹狼",
+                answerImage: "https://lochoive-code.github.io/redwhitegames/e1-ans-pic.png" 
+            },
+            E1: { 
+                name: "E2", 
+                type: "mcq_audio", 
+                question: "請問這首歌是哪部電影的經典音樂？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e2-question-music", 
+                options: [
+                    { text: "A：不可能的任務 Mission Impossible", isCorrect: false },
+                    { text: "B：玩命關頭 Fast & Furious", isCorrect: true },
+                    { text: "C：007 : James Bond", isCorrect: false }
+                ],
+                answerText: "玩命關頭 Fast & Furious" 
+            },
+            E2: { 
+                name: "E3", 
+                type: "mcq_audio", 
+                question: "請問這首歌是哪部電影的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e3-quesiton-music.mp3", 
+                options: [
+                    { text: "A：銀翼殺手 Blade Runner", isCorrect: false },
+                    { text: "B：終極保鑣 The Bodyguard", isCorrect: true },
+                    { text: "C：捍衛戰士 Top Gun", isCorrect: false }
+                ],
+                answerText: "終極保鑣 The Bodyguard" 
+            },
+            E3: { 
+                name: "E4", 
+                type: "mcq_audio", 
+                question: "迪士尼動畫－獅子王中斯瓦希里語的「Hakuna Matata」，中文是甚麼意思呢？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e4-quesion-music.mp3", 
+                options: [
+                    { text: "A：別擔心、沒問題，要放輕鬆", isCorrect: true },
+                    { text: "B：生命只有一次，抓住機會", isCorrect: false },
+                    { text: "C：抓住今天、活在當下", isCorrect: false }
+                ],
+                answerText: "別擔心、沒問題，要放輕鬆" 
+            },
+            E4: { 
+                name: "E5", 
+                type: "mcq_audio", 
+                question: "請問這首歌是哪部電影的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e5-quesion-music", 
+                options: [
+                    { text: "A：動物方城式 Zootopia", isCorrect: false },
+                    { text: "B：樂來樂愛你 La La Land", isCorrect: false },
+                    { text: "C：一個巨星的誕生 A Star is Born", isCorrect: true }
+                ],
+                answerText: "一個巨星的誕生 A Star is Born" 
+            },
+
+            // F 類別 (我幫你選 - 已更新)
+            F0: { 
+                name: "F1 (我幫你選)", 
+                type: "sing-song", 
+                question: "請唱出台語歌曲《愛拚才會贏》任一段落，至少唱出 兩句以上", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f1-quesiton-music.mp3", 
+                requirement: "須至少唱出 兩句以上",
+                answerText: "參考答案：\n一時失志不免怨嘆，一時落魄不免膽寒" 
+            },
+            F1: { 
+                name: "F2 (我幫你選)", 
+                type: "audio", 
+                question: "請說出這首歌的歌手及歌名？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f2-question-music.mp3", 
+                answerText: "歌手：S.H.E\n歌曲：Super Star" 
+            },
+            F2: { 
+                name: "F3 (我幫你選)", 
+                type: "mcq_audio", 
+                question: "請問這首歌是哪部偶像劇的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f3-quesiton-music.mp3", 
+                options: [
+                    { text: "A：薰衣草", isCorrect: true },
+                    { text: "B：MVP情人", isCorrect: false },
+                    { text: "C：微笑PASTA", isCorrect: false }
+                ],
+                answerText: "A：薰衣草" 
+            },
+            F3: { 
+                name: "F4 (我幫你選)", 
+                type: "audio", 
+                question: "請說出這首歌的歌手及歌名？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f4-quesiton-music.mp3", 
+                answerText: "歌手：茄子蛋\n歌曲：浪子回頭" 
+            },
+            F4: { 
+                name: "F5 (我幫你選)", 
+                type: "mcq_audio", 
+                question: "請問這首歌是哪部電影的主題曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f5-quesiton-music.mp3", 
+                options: [
+                    { text: "A：魔髮奇緣 Tangled", isCorrect: false },
+                    { text: "B：冰雪奇緣 Frozen", isCorrect: true },
+                    { text: "C：海洋奇緣 Moana", isCorrect: false }
+                ],
+                answerText: "B：冰雪奇緣 Frozen" 
+            }
         };
 
         // --- 輔助函式 ---
@@ -649,9 +775,28 @@
                 const data = FAST_QA_ANSWERS[card.row] || {};
                 let interactionAreaContent = '';
                 let answerDisplayHtml = '';
+                let questionMediaHtml = '';
+
+                // --- 新增：處理題目區域的媒體 (圖片/音樂) ---
+                if (data.questionImage) {
+                    questionMediaHtml += `
+                        <img src="${data.questionImage}" class="max-h-48 rounded-lg border border-purple-500 mx-auto mt-4 mb-2 shadow-lg" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/4B5563/ffffff?text=圖片載入失敗';">
+                    `;
+                }
+                if (data.audio) {
+                    questionMediaHtml += `
+                        <div class="mt-4 w-full bg-purple-950/50 p-3 rounded border border-purple-500/30">
+                            <p class="text-sm text-purple-300 mb-2 flex items-center justify-center">
+                                <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放題目音樂
+                            </p>
+                            <audio id="question-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
+                        </div>
+                    `;
+                }
 
                 // --- 答案顯示區塊 (包含圖片或純文字) ---
-                if (data.type === 'image_answer' && data.answerImage) {
+                if (data.answerImage) {
                     answerDisplayHtml = `
                         <div class="flex flex-col items-center p-4">
                             <p class="text-2xl font-bold text-white mb-3">${data.answer}</p>
@@ -661,23 +806,26 @@
                         </div>
                     `;
                 } else {
-                    answerDisplayHtml = `<p class="text-3xl font-bold text-white">${data.answer}</p>`;
+                    answerDisplayHtml = `<p class="text-3xl font-bold text-white whitespace-pre-line">${data.answer}</p>`;
                 }
 
                 // --- 互動區域 (按鈕) ---
                 if (data.type === 'mcq') {
-                    // 選擇題
-                    interactionAreaContent = `<div class="grid grid-cols-2 gap-4 mt-4 w-full max-w-2xl">
+                    // 選擇題 (垂直排列選項以容納較長文字)
+                    interactionAreaContent = `<div class="flex flex-col gap-3 mt-4 w-full max-w-2xl">
                         ${data.options.map((opt, idx) => `
-                            <button onclick="handleFastQaOption(this, ${opt.isCorrect})" class="p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-xl font-bold transition text-white">${opt.text}</button>
+                            <button onclick="handleFastQaOption(this, ${opt.isCorrect})" class="p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-lg font-bold transition text-white border border-purple-500 shadow-md text-left pl-6">
+                                ${opt.text}
+                            </button>
                         `).join('')}
                     </div>`;
                 } else {
-                    // 純文字問答 或 圖片答案 (主持人根據實際情況判定對錯)
+                    // 純文字問答 或 圖片答案 (修改：只保留一個「答案」按鈕，點擊後直接看答案)
                     interactionAreaContent = `
                         <div class="flex space-x-4 mt-4">
-                            <button onclick="showFastQaResult(true)" class="px-6 py-3 bg-green-600 rounded-full font-bold transition transform hover:scale-105">答對</button>
-                            <button onclick="showFastQaResult(false)" class="px-6 py-3 bg-red-600 rounded-full font-bold transition transform hover:scale-105">答錯/看答案</button>
+                            <button onclick="showFastQaResult(false)" class="px-10 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-full font-bold transition transform hover:scale-105 shadow-lg text-xl border-2 border-purple-400">
+                                <i data-lucide="eye" class="w-6 h-6 inline-block mr-2 align-text-bottom"></i>看答案
+                            </button>
                         </div>
                     `;
                 }
@@ -699,25 +847,29 @@
 
                         <div class="w-full max-w-3xl bg-gray-900 p-8 rounded-xl border-2 border-purple-500 mb-4 min-h-[150px] flex flex-col items-center justify-center shadow-xl">
                             <p class="text-3xl md:text-4xl font-bold text-white">${data.question}</p>
+                            <!-- 插入題目媒體 (圖片/音樂) -->
+                            ${questionMediaHtml}
+                            
                             <div id="qa-interaction-area" class="hidden w-full flex flex-col items-center">
                                 ${interactionAreaContent}
                             </div>
                         </div>
 
-                        <div id="qa-result" class="hidden mt-4 animate-expand">
+                        <div id="qa-result" class="hidden mt-4 animate-expand w-full flex justify-center">
                              <div id="qa-success" class="hidden flex flex-col items-center p-4 bg-green-900/80 rounded border border-green-500 w-full max-w-3xl">
                                 <i data-lucide="medal" class="w-20 h-20 text-yellow-400 mb-2"></i>
                                 <span class="text-3xl font-black text-yellow-400">答對了！</span>
                              </div>
-                             <div id="qa-fail" class="hidden p-4 bg-red-900/80 rounded border border-red-500 w-full max-w-3xl">
-                                <p class="text-gray-300">正確答案</p>
+                             <!-- 修改：將失敗區塊改為紫色系，作為通用的答案顯示區 -->
+                             <div id="qa-fail" class="hidden p-4 bg-purple-900/80 rounded border border-purple-500 w-full max-w-3xl">
+                                <p class="text-purple-200 font-bold mb-2">正確答案</p>
                                 ${answerDisplayHtml}
                              </div>
                         </div>
                     </div>
                 `;
             }
-            // E/F: 經典/本土/加碼 (保持手動播放)
+            // E/F: 經典/本土/加碼 (更新後支援 MCQ 與圖片)
             else {
                 const isF = card.col === 5;
                 const data = CLASSIC_QA_ANSWERS[`${isF ? 'F' : 'E'}${card.row}`] || {};
@@ -727,14 +879,34 @@
                 const bgColor = isF ? 'bg-yellow-900/40' : 'bg-indigo-900/40';
                 
                 let mediaHtml = '';
-                if (data.type === 'audio-line') {
-                    // E/F 類別音訊：保持手動播放
+                // 檢查是否有音訊
+                if (data.audio) {
                     mediaHtml = `
-                        <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
-                            <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
-                        </p>
-                        <audio id="active-audio" controls src="${data.audio}" class="w-full max-w-md my-4"></audio>
+                        <div class="w-full mt-4 bg-${color}-950/50 p-3 rounded border border-${color}-500/30">
+                            <p class="text-sm text-${color}-300 mb-2 flex items-center justify-center">
+                                <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放音訊
+                            </p>
+                            <audio id="active-audio" controls src="${data.audio}" class="w-full"></audio>
+                        </div>
                     `;
+                }
+
+                // 檢查是否有選項 (MCQ)
+                let interactionHtml = '';
+                if (data.options) {
+                    interactionHtml = `<div class="grid grid-cols-1 gap-3 w-full max-w-2xl mt-4">
+                        ${data.options.map((opt, i) => `
+                            <button onclick="checkClassicOption(this, ${opt.isCorrect})" class="classic-opt-btn p-4 bg-${color}-800/50 hover:bg-${color}-700 rounded-lg text-lg font-bold transition text-white border border-${color}-500 text-left">
+                                ${opt.text}
+                            </button>
+                        `).join('')}
+                    </div>`;
+                }
+
+                // 檢查是否有答案圖片
+                let answerMediaHtml = '';
+                if (data.answerImage) {
+                    answerMediaHtml = `<img src="${data.answerImage}" class="max-h-64 rounded-lg border-2 border-${color}-400 mt-4 mx-auto shadow-lg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/${isF ? 'F59E0B' : '6366F1'}/ffffff?text=圖片載入失敗'">`;
                 }
 
                 content = `
@@ -742,20 +914,22 @@
                         ${closeBtn}
                         <h3 class="text-3xl font-bold ${textColor} mb-4">${category.name} - ${label}</h3>
                         
-                        <div class="bg-gray-900 p-6 rounded-xl border-2 ${borderColor}/50 mb-6 w-full max-w-3xl shadow-xl">
+                        <div class="bg-gray-900 p-6 rounded-xl border-2 ${borderColor}/50 mb-6 w-full max-w-3xl shadow-xl flex flex-col items-center">
                             <p class="text-2xl md:text-3xl font-black text-white whitespace-pre-line leading-relaxed mb-4">${data.question || '主持人自由出題'}</p>
-                            ${data.requirement ? `<p class="text-lg font-bold text-red-400 border-t border-gray-700 pt-2">${data.requirement}</p>` : ''}
+                            ${data.requirement ? `<p class="text-lg font-bold text-red-400 border-t border-gray-700 pt-2 w-full">${data.requirement}</p>` : ''}
                             ${mediaHtml}
+                            ${interactionHtml}
                         </div>
 
                         <div id="answer-box" class="hidden w-full max-w-3xl ${bgColor} p-6 rounded-lg border ${borderColor} mb-4 animate-expand">
-                            <p class="text-xl text-${color}-200 font-bold mb-2">參考答案</p>
+                            <p class="text-xl text-${color}-200 font-bold mb-2">正確答案</p>
                             <p class="text-3xl font-bold text-white whitespace-pre-line">${data.answerText || ''}</p>
-                            <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
+                            ${data.from ? `<p class="text-sm text-gray-400 mt-2">${data.from}</p>` : ''}
+                            ${answerMediaHtml}
                         </div>
 
-                        <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-${color}-600 hover:bg-${color}-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
-                            <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 揭曉答案
+                        <button id="show-answer-btn" onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-${color}-600 hover:bg-${color}-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
+                            <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 看答案
                         </button>
                     </div>
                 `;
@@ -804,6 +978,48 @@
                 document.getElementById('qa-success').classList.add('hidden'); // 確保成功隱藏
             }
         }
+        
+        // --- 新增：經典/本土歌 選擇題互動邏輯 ---
+        window.checkClassicOption = function(btn, isCorrect) {
+            // 1. 鎖定所有按鈕，避免重複點擊
+            const parent = btn.parentElement;
+            Array.from(parent.children).forEach(child => {
+                child.disabled = true; // 鎖定
+                child.classList.add('cursor-not-allowed', 'opacity-50'); // 變灰
+                if (child === btn) {
+                    child.classList.remove('opacity-50');
+                    child.classList.add('opacity-100');
+                }
+            });
+
+            // 2. 顯示按鈕本身的對錯樣式
+            if (isCorrect) {
+                btn.classList.add('bg-green-600', 'ring-4', 'ring-green-300', 'scale-105');
+                btn.innerHTML += ' <i data-lucide="check-circle" class="inline w-6 h-6 ml-2"></i>';
+            } else {
+                btn.classList.add('bg-red-600', 'ring-4', 'ring-red-300');
+                btn.innerHTML += ' <i data-lucide="x-circle" class="inline w-6 h-6 ml-2"></i>';
+            }
+            lucide.createIcons();
+
+            // 3. 處理答案區顯示
+            const answerBox = document.getElementById('answer-box');
+            const showAnswerBtn = document.getElementById('show-answer-btn');
+            
+            // 隱藏「揭曉答案」按鈕
+            if(showAnswerBtn) showAnswerBtn.classList.add('hidden');
+
+            // 準備結果標題
+            const resultHeader = document.createElement('div');
+            resultHeader.className = `text-4xl font-black mb-4 ${isCorrect ? 'text-green-400' : 'text-red-400'} animate-bounce-slow`;
+            resultHeader.innerHTML = isCorrect ? '🎉 答對了！' : '❌ 答錯了！';
+            
+            // 將結果標題插入到 Answer Box 最前面
+            answerBox.insertBefore(resultHeader, answerBox.firstChild);
+
+            // 顯示 Answer Box
+            answerBox.classList.remove('hidden');
+        }
 
         // --- 頁面渲染函式 ---
         
@@ -837,6 +1053,21 @@
             
             lucide.createIcons();
         }
+        
+        // 新增處理選單卡片點擊的函式 (翻牌與導航邏輯)
+        window.handleMenuCardClick = function(el, type) {
+            if (el.classList.contains('is-flipped')) {
+                // 已經翻開了 -> 執行導航
+                if (type === 'red') {
+                    navigateTo(() => renderRedBallTutorialSteps(0));
+                } else {
+                    navigateTo(() => renderWhiteBallTutorialSteps(0));
+                }
+            } else {
+                // 尚未翻開 -> 執行翻牌 (單向，不可逆)
+                el.classList.add('is-flipped');
+            }
+        }
 
         function renderMenu() {
             setVideoBackground(VIDEO_URLS.HOME);
@@ -862,23 +1093,43 @@
             
             modalContent.innerHTML = `
                 <div class="space-y-4 p-6 pt-10">
-                    <h3 class="text-4xl font-bold text-center text-white text-shadow mb-4">選擇遊戲模式</h3>
-                    <!-- 導向新的紅色球步驟流程 -->
-                    <button onclick="navigateTo(() => renderRedBallTutorialSteps(0))" class="w-full p-6 bg-red-600 hover:bg-red-700 rounded-lg flex items-center justify-center space-x-4 transition transform hover:scale-105 shadow-xl">
-                        <span class="text-5xl">🔴</span>
-                        <div class="text-left">
-                            <div class="text-2xl font-black">紅白拳王爭霸戰</div>
-                            <div class="text-sm opacity-80">動作教學 & 規則說明</div>
+                    <h3 class="text-4xl font-bold text-center text-white text-shadow mb-6">選擇遊戲模式</h3>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        <!-- Red Ball Game Card -->
+                        <div class="card-container h-48 w-full" onclick="handleMenuCardClick(this, 'red')">
+                            <!-- Front (Mystery) -->
+                            <div class="card-face card-front bg-gray-800 border-4 border-gray-600 shadow-xl flex flex-col items-center justify-center group hover:border-gray-400 transition-colors">
+                                <span class="text-6xl animate-pulse text-gray-500">?</span>
+                                <span class="text-sm text-gray-400 mt-2 font-bold group-hover:text-white">點擊揭曉</span>
+                            </div>
+                            <!-- Back (Revealed) -->
+                            <div class="card-face card-back !bg-red-600 !border-red-400 shadow-xl flex items-center justify-center space-x-4">
+                                <span class="text-5xl">🔴</span>
+                                <div class="text-left">
+                                    <div class="text-2xl font-black">紅白拳王爭霸戰</div>
+                                    <div class="text-sm opacity-80">點擊開始</div>
+                                </div>
+                            </div>
                         </div>
-                    </button>
-                    <!-- 導向白色球步驟流程 -->
-                    <button onclick="navigateTo(() => renderWhiteBallTutorialSteps(0))" class="w-full p-6 bg-white hover:bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center space-x-4 transition transform hover:scale-105 shadow-xl">
-                        <span class="text-5xl">⚪</span>
-                        <div class="text-left">
-                            <div class="text-2xl font-black">紅白大歌星</div>
-                            <div class="text-sm opacity-80">搶答模式 & 遊戲流程</div>
+
+                        <!-- White Ball Game Card -->
+                        <div class="card-container h-48 w-full" onclick="handleMenuCardClick(this, 'white')">
+                             <!-- Front (Mystery) -->
+                            <div class="card-face card-front bg-gray-800 border-4 border-gray-600 shadow-xl flex flex-col items-center justify-center group hover:border-gray-400 transition-colors">
+                                <span class="text-6xl animate-pulse text-gray-500">?</span>
+                                <span class="text-sm text-gray-400 mt-2 font-bold group-hover:text-white">點擊揭曉</span>
+                            </div>
+                            <!-- Back (Revealed) -->
+                            <div class="card-face card-back !bg-white !text-gray-900 !border-gray-300 shadow-xl flex items-center justify-center space-x-4">
+                                <span class="text-5xl">⚪</span>
+                                <div class="text-left">
+                                    <div class="text-2xl font-black">紅白大歌星</div>
+                                    <div class="text-sm opacity-80">點擊開始</div>
+                                </div>
+                            </div>
                         </div>
-                    </button>
+                    </div>
                 </div>
             `;
             lucide.createIcons();
@@ -1259,7 +1510,7 @@
                     </div>
                     
                     <p class="text-gray-300 text-sm mb-3 text-shadow text-center">
-                        遊戲卡片主板：30 張卡片已完整呈現於畫面中。
+                        30 張卡片等待你的選擇，翻開一張，開啟驚喜！
                     </p>
 
                     <div id="game-board-grid" class="mb-4">
