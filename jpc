@@ -208,7 +208,7 @@
 
     <!-- 全螢幕背景影片 -->
     <video autoplay loop muted playsinline id="video-background">
-        <source src="https://lochoive-code.github.io/video/redwhite-game.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
+        <source src="https://lochoive-code.github.io/video/redwhite-game_01.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
     </video>
 
     <!-- 半透明遮罩 (用於動態 dimming effect，初始透明) -->
@@ -236,7 +236,7 @@
     <script>
         // --- 資料設定 ---
         const VIDEO_URLS = {
-            HOME: "https://lochoive-code.github.io/video/redwhite-game.mp4",
+            HOME: "https://lochoive-code.github.io/video/redwhite-game_01.mp4",
             GAME: "https://lochoive-code.github.io/video/redwhite-game_02.mp4" 
         };
 
