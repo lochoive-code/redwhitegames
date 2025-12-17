@@ -317,7 +317,7 @@
             { name: "題目 A2", song: "隱形的翅膀", artist: "張韶涵", audio: "https://lochoive-code.github.io/redwhitegames/a2-wings.mp3" },
             { name: "題目 A3", song: "我是一隻小小鳥", artist: "趙傳", audio: "https://lochoive-code.github.io/redwhitegames/a3-birdy.mp3" },
             { name: "題目 A4", song: "Rolling in the deep", artist: "Adele", audio: "https://lochoive-code.github.io/redwhitegames/a4-Rolling-in-the-deep.mp3" },
-            { name: "題目 A5", song: "戀愛ing", artist: "五月天", audio: "https://lochoive-code.github.io/redwhitegames/a5-love-ing.mp3" },
+            { name: "題目 A5", song: "家後", artist: "江蕙", audio: "https://lochoive-code.github.io/redwhitegames/a5-question-music_REV.mp3" },
         ];
         
         // B 類別：新增 audio 欄位 (已包含音樂連結)
@@ -326,7 +326,7 @@
             { name: "B2", question: "心甘情願感染你的氣息...", answer: "我愛你有幾分", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
             { name: "B3", question: "背棄了理想，誰人都可以", answer: "哪會怕有一天只你共我", hint: "★★★★★★★★★★ (10 字)", from: "Beyond《海闊天空》", audio: "https://lochoive-code.github.io/redwhitegames/b3-hksong.mp3" },
             { name: "B4", question: "若分開...", answer: "已經不知何時何日才會通甲你來相逢", hint: "★★★★★★★★★★★★★★★★ (16 字)", from: "郭桂彬與黃乙玲《海波浪》", audio: "https://lochoive-code.github.io/redwhitegames/b4-wave.mp3" },
-            { name: "B5", question: "我們一起學貓叫...", answer: "一起喵喵喵喵喵", hint: "★★★★★★★ (7 字)", from: "小潘潘 / 小峰峰《學貓叫》", audio: "https://lochoive-code.github.io/redwhitegames/b5-meow.mp3" }
+            { name: "B5", question: "對酒當歌，唱出心中喜悅...", answer: "轟轟烈烈，把握青春年華", hint: "★★★★★★★★★★ (10 字)", from: "動力火車《當》", audio: "https://lochoive-code.github.io/redwhitegames/b5_question_music_REV.mp3" }
         ];
 
         // C 類別：已更新為使用者要求內容
@@ -446,7 +446,7 @@
                 name: "E2", 
                 type: "mcq_audio", 
                 question: "請問這首歌是哪部電影的經典音樂？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/e2-question-music.mp3", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e2-question-music_REV.mp3", 
                 options: [
                     { text: "A：不可能的任務 Mission Impossible", isCorrect: false },
                     { text: "B：玩命關頭 Fast & Furious", isCorrect: true },
@@ -482,23 +482,27 @@
                 name: "E5", 
                 type: "mcq_audio", 
                 question: "請問這首歌是哪部電影的主題曲？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/e5-quesion-music.mp3", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e5-quesion-music-REV.mp3", 
                 options: [
-                    { text: "A：動物方城式 Zootopia", isCorrect: false },
-                    { text: "B：樂來樂愛你 La La Land", isCorrect: false },
-                    { text: "C：一個巨星的誕生 A Star is Born", isCorrect: true }
+                    { text: "A：海角七號", isCorrect: true },
+                    { text: "B：紅衣小女孩", isCorrect: false },
+                    { text: "C：賽德克巴萊", isCorrect: false }
                 ],
-                answerText: "一個巨星的誕生 A Star is Born" 
+                answerText: "海角七號" 
             },
 
             // F 類別 (我幫你選 - 已更新)
             F0: { 
                 name: "F1 (我幫你選)", 
-                type: "sing-song", 
-                question: "請唱出台語歌曲《愛拚才會贏》任一段落，至少唱出 兩句以上", 
+                type: "mcq_audio", 
+                question: "世界名曲《天鵝湖》的作曲家是哪一位？", 
                 audio: "https://lochoive-code.github.io/redwhitegames/f1-quesiton-music.mp3", 
-                requirement: "須至少唱出 兩句以上",
-                answerText: "參考答案：\n一時失志不免怨嘆，一時落魄不免膽寒" 
+                options: [
+                    { text: "A. 巴哈", isCorrect: false },
+                    { text: "B. 蕭邦", isCorrect: false },
+                    { text: "C. 柴可夫斯基", isCorrect: true }
+                ],
+                answerText: "柴可夫斯基" 
             },
             F1: { 
                 name: "F2 (我幫你選)", 
@@ -513,11 +517,11 @@
                 question: "請問這首歌是哪部偶像劇的主題曲？", 
                 audio: "https://lochoive-code.github.io/redwhitegames/f3-quesiton-music.mp3", 
                 options: [
-                    { text: "A：薰衣草", isCorrect: true },
-                    { text: "B：MVP情人", isCorrect: false },
-                    { text: "C：微笑PASTA", isCorrect: false }
+                    { text: "A. 流星花園", isCorrect: true },
+                    { text: "B. MVP情人", isCorrect: false },
+                    { text: "C. 微笑PASTA", isCorrect: false }
                 ],
-                answerText: "A：薰衣草" 
+                answerText: "流星花園" 
             },
             F3: { 
                 name: "F4 (我幫你選)", 
@@ -804,6 +808,9 @@
                 let interactionAreaContent = '';
                 let answerDisplayHtml = '';
                 let questionMediaHtml = '';
+                
+                // 設定計時器秒數：D2(row=1) 和 D5(row=4) 為 10秒，其餘(D1, D3, D4) 為 5秒
+                const timerDuration = (card.row === 1 || card.row === 4) ? 10 : 5;
 
                 // --- 新增：處理題目區域的媒體 (圖片/音樂) ---
                 if (data.questionImage) {
@@ -816,10 +823,8 @@
                 if (data.audio) {
                     questionMediaHtml += `
                         <div class="mt-4 w-full bg-purple-950/50 p-3 rounded border border-purple-500/30">
-                            <p class="text-sm text-purple-300 mb-2 flex items-center justify-center">
-                                <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放題目音樂
-                            </p>
-                            <audio id="question-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
+                            <audio id="question-audio-${label}" controls autoplay src="${data.audio}" class="w-full mb-2"></audio>
+                            <p class="text-xs text-yellow-500">🔊 音樂已自動播放，若未播放請手動點擊</p>
                         </div>
                     `;
                 }
@@ -866,12 +871,12 @@
                         ${closeBtn}
                         <div class="flex justify-between w-full max-w-3xl items-center mb-4">
                             <h3 class="text-xl md:text-3xl font-bold text-purple-400">${category.name} - ${label}</h3>
-                            <div id="timer-display" class="text-4xl md:text-5xl font-mono font-black text-white bg-gray-900 px-4 py-2 rounded border border-purple-500">5</div>
+                            <div id="timer-display" class="text-4xl md:text-5xl font-mono font-black text-white bg-gray-900 px-4 py-2 rounded border border-purple-500">${timerDuration}</div>
                         </div>
 
                         <div id="qa-start-overlay" class="absolute inset-0 bg-gray-800/90 z-10 flex flex-col items-center justify-center rounded-lg">
-                            <button onclick="startFastQa(this)" class="px-8 md:px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white text-xl md:text-2xl font-bold rounded-full shadow-xl pulse-once">
-                                開始計時 (5秒)
+                            <button onclick="startFastQa(this, ${timerDuration})" class="px-8 md:px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white text-xl md:text-2xl font-bold rounded-full shadow-xl pulse-once">
+                                開始計時 (${timerDuration}秒)
                             </button>
                         </div>
 
@@ -969,11 +974,11 @@
         }
 
         // --- 快問快答 專屬邏輯 (保持不變) ---
-        window.startFastQa = function(btn) {
+        window.startFastQa = function(btn, duration) {
             document.getElementById('qa-start-overlay').classList.add('hidden');
             document.getElementById('qa-interaction-area').classList.remove('hidden');
             
-            let time = 5;
+            let time = duration;
             const timerEl = document.getElementById('timer-display');
             timerEl.innerText = time;
             
@@ -981,7 +986,7 @@
             fastQATimerInterval = setInterval(() => {
                 time--;
                 timerEl.innerText = time;
-                if(time <= 2) timerEl.classList.add('text-red-500', 'timer-active');
+                if(time <= 3) timerEl.classList.add('text-red-500', 'timer-active');
                 if(time <= 0) {
                     clearInterval(fastQATimerInterval);
                     timerEl.classList.remove('timer-active');
