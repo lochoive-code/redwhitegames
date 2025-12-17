@@ -137,19 +137,21 @@
             transform: rotateY(360deg);
         }
         
-        /* --- Grid Layout (核心佈局 - 調整為直式排列 & 更緊湊) --- */
+        /* --- Grid Layout (核心佈局 - RWD 調整) --- */
+        /* 手機版：使用 min-width 強制寬度，配合外層 overflow-scroll 形成滑動效果 */
         #game-board-grid {
             display: grid;
-            /* 6 欄位佈局 (代表 6 個類別) */
             grid-template-columns: repeat(6, 1fr); 
-            gap: 0.25rem; /* 網格間距縮小 */
+            gap: 0.25rem; 
             width: 100%;
+            /* 關鍵 RWD 設定：最小寬度設為 800px，確保在手機上不會擠成一團 */
+            min-width: 800px; 
             max-width: 1200px;
         }
 
         /* 將標頭設定為佔用網格空間 (高度縮小) */
         .category-column-header-cell {
-            height: 3rem; /* 高度縮小 */
+            height: 3.5rem; /* 稍微加高以容納手機版兩行字 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,21 +159,47 @@
             padding: 0.25rem;
             font-weight: 800;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            border-radius: 0.25rem; /* 稍微縮小圓角 */
-            font-size: 0.875rem; /* 字體縮小 */
+            border-radius: 0.25rem; 
+            font-size: 0.875rem;
+            line-height: 1.1; /* 緊湊行高 */
         }
         
         /* 確保遊戲板卡片高度一致 */
         #game-board-grid .card-container {
-            height: 5rem; 
+            height: 4.5rem; /* 手機版稍微縮小高度 */
+        }
+        @media (min-width: 768px) {
+             #game-board-grid .card-container {
+                height: 5.5rem; 
+            }
         }
 
         /* Modal 樣式 - 確保內容置中且完整呈現 */
         .modal-content-area {
             /* 確保內容可以垂直滾動 */
-            max-height: 90vh; 
+            max-height: 85vh; /* 留一點空間給邊距 */
             overflow-y: auto; 
             width: 100%;
+            /* 自定義捲軸樣式 (Chrome/Safari) */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        /* 隱藏捲軸但在觸控時可用 (Optional aesthetics) */
+        .modal-content-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-content-area::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        /* 隱藏 Chrome/Safari/Opera 的預設捲軸 (用於橫向滑動區) */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
 
     </style>
@@ -193,10 +221,10 @@
 
     <!-- 選單 Modal (通用於選單和卡片內容展示) -->
     <div id="game-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-        <!-- 預設為最大卡片尺寸 (max-w-2xl) -->
-        <div id="modal-content-wrapper" class="bg-gray-900 text-white rounded-xl shadow-2xl w-full max-w-2xl border-4 border-yellow-400 p-2 transform scale-95 opacity-0 transition-all duration-300 relative">
+        <!-- RWD: 預設 w-full, 在大螢幕限制 max-w -->
+        <div id="modal-content-wrapper" class="bg-gray-900 text-white rounded-xl shadow-2xl w-full max-w-2xl border-4 border-yellow-400 p-2 transform scale-95 opacity-0 transition-all duration-300 relative flex flex-col max-h-[95vh]">
             <!-- 新增通用關閉按鈕，用於 Menu 頁面返回 Home -->
-            <button id="modal-close-home-btn" onclick="closeModalAndGoHome()" class="absolute top-3 right-3 text-gray-400 hover:text-red-400 transition z-20 hidden">
+            <button id="modal-close-home-btn" onclick="closeModalAndGoHome()" class="absolute top-2 right-2 md:top-3 md:right-3 text-gray-400 hover:text-red-400 transition z-20 hidden">
                 <i data-lucide="x-circle" class="w-8 h-8"></i>
             </button>
             <div id="modal-content" class="modal-content-area">
@@ -365,9 +393,9 @@
             { 
                 type: 'image_question', 
                 question: '請選出圖片為歌手「周杰倫」的3張照片', 
-                questionImage: 'https://lochoive-code.github.io/redwhitegames/d1-question-jay.png', // 示意圖
+                questionImage: 'https://lochoive-code.github.io/redwhitegames/d1-question-jay.jpg', // 示意圖
                 answer: '周杰倫', 
-                answerImage: 'https://lochoive-code.github.io/redwhitegames/d1-answer-jay.png' // 示意圖
+                answerImage: 'https://lochoive-code.github.io/redwhitegames/d1-answer-jay.jpg' // 示意圖
             },
             // D2 (音樂題)
             { 
@@ -418,7 +446,7 @@
                 name: "E2", 
                 type: "mcq_audio", 
                 question: "請問這首歌是哪部電影的經典音樂？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/e2-question-music", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e2-question-music.mp3", 
                 options: [
                     { text: "A：不可能的任務 Mission Impossible", isCorrect: false },
                     { text: "B：玩命關頭 Fast & Furious", isCorrect: true },
@@ -454,7 +482,7 @@
                 name: "E5", 
                 type: "mcq_audio", 
                 question: "請問這首歌是哪部電影的主題曲？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/e5-quesion-music", 
+                audio: "https://lochoive-code.github.io/redwhitegames/e5-quesion-music.mp3", 
                 options: [
                     { text: "A：動物方城式 Zootopia", isCorrect: false },
                     { text: "B：樂來樂愛你 La La Land", isCorrect: false },
@@ -613,11 +641,11 @@
             }, 300); 
         }
 
-        // --- HTML 內容生成器 (已優化 D 類別) ---
+        // --- HTML 內容生成器 (已優化 D 類別 - RWD 支援) ---
         function getGameContentHTML(card) {
             // 題目卡片內部的關閉按鈕
             const closeBtn = `
-                <button onclick="closeContentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-20">
+                <button onclick="closeContentModal()" class="absolute top-2 right-2 md:top-4 md:right-4 text-gray-400 hover:text-white transition z-20">
                     <i data-lucide="x-circle" class="w-8 h-8"></i>
                 </button>
             `;
@@ -630,10 +658,10 @@
             if (card.col === 0) {
                 const data = MUSIC_ANSWERS[card.row] || {};
                 content = `
-                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                    <div class="p-4 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
                         ${closeBtn}
-                        <h3 class="text-3xl font-bold text-red-400 mb-2">${category.name} - ${label}</h3>
-                        <p class="text-lg text-gray-300 mb-6">請聆聽音樂並回答歌名與歌手</p>
+                        <h3 class="text-xl md:text-3xl font-bold text-red-400 mb-2">${category.name} - ${label}</h3>
+                        <p class="text-base md:text-lg text-gray-300 mb-6">請聆聽音樂並回答歌名與歌手</p>
                         
                         <div class="w-full max-w-lg bg-gray-900 p-4 rounded-xl border border-red-500/30 mb-6 shadow-xl">
                             <!-- 已新增 autoplay 屬性以自動播放 -->
@@ -643,8 +671,8 @@
 
                         <div id="answer-box" class="hidden w-full max-w-lg bg-red-900/40 p-4 rounded-lg border border-red-500 mb-4 animate-expand">
                             <p class="text-sm text-red-400 font-bold">正確答案</p>
-                            <p class="text-2xl font-bold text-white mt-1">${data.song || '資料遺失'}</p>
-                            <p class="text-md text-gray-300">${data.artist || ''}</p>
+                            <p class="text-xl md:text-2xl font-bold text-white mt-1">${data.song || '資料遺失'}</p>
+                            <p class="text-sm md:text-md text-gray-300">${data.artist || ''}</p>
                         </div>
 
                         <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
@@ -657,14 +685,14 @@
             else if (card.col === 1) {
                 const data = GAP_FILL_ANSWERS[card.row] || {};
                 content = `
-                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                    <div class="p-4 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
                         ${closeBtn}
-                        <h3 class="text-3xl font-bold text-blue-400 mb-4">${category.name} - ${label}</h3>
+                        <h3 class="text-xl md:text-3xl font-bold text-blue-400 mb-4">${category.name} - ${label}</h3>
                         
-                        <div class="bg-gray-900 p-6 rounded-xl border-2 border-blue-500/50 mb-6 w-full max-w-3xl shadow-xl">
-                            <p class="text-xl text-yellow-300 mb-3"><i data-lucide="pencil" class="inline w-5 h-5 mr-1"></i> 接出下一句歌詞</p>
-                            <p class="text-2xl md:text-4xl font-black text-white leading-relaxed mb-4">${data.question || '資料遺失'}</p>
-                            <p class="text-xl font-bold text-red-400">${data.hint || ''}</p>
+                        <div class="bg-gray-900 p-4 md:p-6 rounded-xl border-2 border-blue-500/50 mb-6 w-full max-w-3xl shadow-xl">
+                            <p class="text-lg md:text-xl text-yellow-300 mb-3"><i data-lucide="pencil" class="inline w-5 h-5 mr-1"></i> 接出下一句歌詞</p>
+                            <p class="text-xl md:text-4xl font-black text-white leading-relaxed mb-4">${data.question || '資料遺失'}</p>
+                            <p class="text-lg md:text-xl font-bold text-red-400 break-words">${data.hint || ''}</p>
                             
                             <!-- B 類別音訊：保持手動播放 -->
                             <div class="mt-4 w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
@@ -676,8 +704,8 @@
                             <!-- 結束 B 類別音訊 -->
                         </div>
 
-                        <div id="answer-box" class="hidden w-full max-w-3xl bg-blue-900/40 p-6 rounded-lg border border-blue-500 mb-4 animate-expand">
-                            <p class="text-3xl font-bold text-white">${data.answer || ''}</p>
+                        <div id="answer-box" class="hidden w-full max-w-3xl bg-blue-900/40 p-4 md:p-6 rounded-lg border border-blue-500 mb-4 animate-expand">
+                            <p class="text-xl md:text-3xl font-bold text-white">${data.answer || ''}</p>
                             <p class="text-sm text-gray-400 mt-2">${data.from || ''}</p>
                         </div>
 
@@ -695,14 +723,14 @@
                 // --- 1. 處理問題媒體 (Image / Audio / MCQ Image) ---
                 if(data.type === 'image' || data.type === 'mcq_image') {
                     mediaHtml = `
-                        <div class="flex flex-col items-center">
-                            <img src="${data.image}" class="max-h-64 rounded-lg border border-green-500 mx-auto mb-4" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">
+                        <div class="flex flex-col items-center w-full">
+                            <img src="${data.image}" class="max-h-48 md:max-h-64 rounded-lg border border-green-500 mx-auto mb-4 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">
                             ${data.type === 'mcq_image' ? `
                                 <div class="grid grid-cols-1 gap-3 w-full max-w-sm mt-4">
                                     ${data.mcq_options.map(opt => `
-                                        <div class="p-3 bg-gray-700 rounded-lg text-lg font-semibold text-white text-center border border-gray-600">
+                                        <button onclick="checkClassicOption(this, ${opt.isCorrect})" class="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-base md:text-lg font-semibold text-white text-center border border-gray-600 transition-all transform active:scale-95 shadow-md">
                                             ${opt.text}
-                                        </div>
+                                        </button>
                                     `).join('')}
                                 </div>
                             ` : ''}
@@ -723,37 +751,37 @@
                 if(data.answerType === 'video') {
                     // 影片答案 (C1, C2, C4) - 保持手動播放
                     answerHtml = `
-                        <p class="text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
-                        <div class="video-container">
-                            <video id="ans-video" controls src="${data.answerVideo}" class="w-full rounded-lg"></video>
+                        <p class="text-lg md:text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
+                        <div class="video-container w-full">
+                            <video id="ans-video" controls src="${data.answerVideo}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black"></video>
                         </div>
                         <p class="text-sm text-green-300 mt-2">請點擊播放觀看答案影片</p>
                     `;
                 } else if (data.answerType === 'image') {
                     // 圖片答案 (C3, C5)
                     answerHtml = `
-                        <p class="text-2xl font-bold text-white mb-3">${data.answerText || '圖片答案'}</p>
-                        <img src="${data.answerImage}" class="max-h-64 rounded-lg border-4 border-green-500 shadow-xl mx-auto" 
+                        <p class="text-xl md:text-2xl font-bold text-white mb-3">${data.answerText || '圖片答案'}</p>
+                        <img src="${data.answerImage}" class="max-h-48 md:max-h-64 rounded-lg border-4 border-green-500 shadow-xl mx-auto w-auto" 
                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗';" 
                             alt="答案圖片">
                     `;
                 } else if (data.answerType === 'audio') {
                     // 音樂答案 (Fallback, C4 已被移除) - 保持手動播放
                     answerHtml = `
-                        <p class="text-2xl font-bold text-white mb-3">歌手：${data.answerText || '音樂答案'}</p>
+                        <p class="text-xl md:text-2xl font-bold text-white mb-3">歌手：${data.answerText || '音樂答案'}</p>
                         <p class="text-sm text-yellow-500 mb-2">請點擊播放音檔</p>
                         <audio id="ans-audio" controls src="${data.answerAudio}" class="w-full"></audio>
                     `;
                 } else {
                     // 純文字答案 (Fallback)
-                    answerHtml = `<p class="text-3xl font-bold text-white">${data.answerText || '正確答案'}</p>`;
+                    answerHtml = `<p class="text-2xl md:text-3xl font-bold text-white">${data.answerText || '正確答案'}</p>`;
                 }
 
                 content = `
-                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                    <div class="p-4 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
                         ${closeBtn}
-                        <h3 class="text-3xl font-bold text-green-400 mb-4">${category.name} - ${label}</h3>
-                        <p class="text-xl text-yellow-300 mb-4">${data.question}</p>
+                        <h3 class="text-xl md:text-3xl font-bold text-green-400 mb-4">${category.name} - ${label}</h3>
+                        <p class="text-lg md:text-xl text-yellow-300 mb-4">${data.question}</p>
                         
                         <div class="w-full max-w-3xl bg-gray-900 p-4 rounded-xl border border-green-500/30 mb-6 shadow-xl">
                             ${mediaHtml}
@@ -779,8 +807,9 @@
 
                 // --- 新增：處理題目區域的媒體 (圖片/音樂) ---
                 if (data.questionImage) {
+                    // 修改：放大題目圖片高度 (max-h-52 md:max-h-80) 以解決圖片過小的問題
                     questionMediaHtml += `
-                        <img src="${data.questionImage}" class="max-h-48 rounded-lg border border-purple-500 mx-auto mt-4 mb-2 shadow-lg" 
+                        <img src="${data.questionImage}" class="max-h-52 md:max-h-80 rounded-lg border border-purple-500 mx-auto mt-4 mb-2 shadow-lg w-auto" 
                              onerror="this.onerror=null; this.src='https://placehold.co/600x400/4B5563/ffffff?text=圖片載入失敗';">
                     `;
                 }
@@ -797,16 +826,17 @@
 
                 // --- 答案顯示區塊 (包含圖片或純文字) ---
                 if (data.answerImage) {
+                    // 修改：放大答案圖片高度 (由 max-h-48 md:max-h-64 改為 max-h-60 md:max-h-96)
                     answerDisplayHtml = `
                         <div class="flex flex-col items-center p-4">
-                            <p class="text-2xl font-bold text-white mb-3">${data.answer}</p>
-                            <img src="${data.answerImage}" class="max-h-64 rounded-lg border-4 border-purple-500 shadow-xl" 
+                            <p class="text-xl md:text-2xl font-bold text-white mb-3">${data.answer}</p>
+                            <img src="${data.answerImage}" class="max-h-60 md:max-h-96 rounded-lg border-4 border-purple-500 shadow-xl w-auto" 
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x400/4B5563/ffffff?text=圖片載入失敗';" 
                                 alt="答案圖片">
                         </div>
                     `;
                 } else {
-                    answerDisplayHtml = `<p class="text-3xl font-bold text-white whitespace-pre-line">${data.answer}</p>`;
+                    answerDisplayHtml = `<p class="text-2xl md:text-3xl font-bold text-white whitespace-pre-line">${data.answer}</p>`;
                 }
 
                 // --- 互動區域 (按鈕) ---
@@ -814,7 +844,7 @@
                     // 選擇題 (垂直排列選項以容納較長文字)
                     interactionAreaContent = `<div class="flex flex-col gap-3 mt-4 w-full max-w-2xl">
                         ${data.options.map((opt, idx) => `
-                            <button onclick="handleFastQaOption(this, ${opt.isCorrect})" class="p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-lg font-bold transition text-white border border-purple-500 shadow-md text-left pl-6">
+                            <button onclick="handleFastQaOption(this, ${opt.isCorrect})" class="p-3 md:p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-base md:text-lg font-bold transition text-white border border-purple-500 shadow-md text-left pl-6">
                                 ${opt.text}
                             </button>
                         `).join('')}
@@ -823,7 +853,7 @@
                     // 純文字問答 或 圖片答案 (修改：只保留一個「答案」按鈕，點擊後直接看答案)
                     interactionAreaContent = `
                         <div class="flex space-x-4 mt-4">
-                            <button onclick="showFastQaResult(false)" class="px-10 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-full font-bold transition transform hover:scale-105 shadow-lg text-xl border-2 border-purple-400">
+                            <button onclick="showFastQaResult(false)" class="px-8 md:px-10 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-full font-bold transition transform hover:scale-105 shadow-lg text-lg md:text-xl border-2 border-purple-400">
                                 <i data-lucide="eye" class="w-6 h-6 inline-block mr-2 align-text-bottom"></i>看答案
                             </button>
                         </div>
@@ -832,21 +862,21 @@
 
 
                 content = `
-                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                    <div class="p-4 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
                         ${closeBtn}
                         <div class="flex justify-between w-full max-w-3xl items-center mb-4">
-                            <h3 class="text-3xl font-bold text-purple-400">${category.name} - ${label}</h3>
-                            <div id="timer-display" class="text-5xl font-mono font-black text-white bg-gray-900 px-4 py-2 rounded border border-purple-500">5</div>
+                            <h3 class="text-xl md:text-3xl font-bold text-purple-400">${category.name} - ${label}</h3>
+                            <div id="timer-display" class="text-4xl md:text-5xl font-mono font-black text-white bg-gray-900 px-4 py-2 rounded border border-purple-500">5</div>
                         </div>
 
                         <div id="qa-start-overlay" class="absolute inset-0 bg-gray-800/90 z-10 flex flex-col items-center justify-center rounded-lg">
-                            <button onclick="startFastQa(this)" class="px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white text-2xl font-bold rounded-full shadow-xl pulse-once">
+                            <button onclick="startFastQa(this)" class="px-8 md:px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white text-xl md:text-2xl font-bold rounded-full shadow-xl pulse-once">
                                 開始計時 (5秒)
                             </button>
                         </div>
 
-                        <div class="w-full max-w-3xl bg-gray-900 p-8 rounded-xl border-2 border-purple-500 mb-4 min-h-[150px] flex flex-col items-center justify-center shadow-xl">
-                            <p class="text-3xl md:text-4xl font-bold text-white">${data.question}</p>
+                        <div class="w-full max-w-3xl bg-gray-900 p-4 md:p-8 rounded-xl border-2 border-purple-500 mb-4 min-h-[150px] flex flex-col items-center justify-center shadow-xl">
+                            <p class="text-2xl md:text-4xl font-bold text-white">${data.question}</p>
                             <!-- 插入題目媒體 (圖片/音樂) -->
                             ${questionMediaHtml}
                             
@@ -857,8 +887,8 @@
 
                         <div id="qa-result" class="hidden mt-4 animate-expand w-full flex justify-center">
                              <div id="qa-success" class="hidden flex flex-col items-center p-4 bg-green-900/80 rounded border border-green-500 w-full max-w-3xl">
-                                <i data-lucide="medal" class="w-20 h-20 text-yellow-400 mb-2"></i>
-                                <span class="text-3xl font-black text-yellow-400">答對了！</span>
+                                <i data-lucide="medal" class="w-16 h-16 md:w-20 md:h-20 text-yellow-400 mb-2"></i>
+                                <span class="text-2xl md:text-3xl font-black text-yellow-400">答對了！</span>
                              </div>
                              <!-- 修改：將失敗區塊改為紫色系，作為通用的答案顯示區 -->
                              <div id="qa-fail" class="hidden p-4 bg-purple-900/80 rounded border border-purple-500 w-full max-w-3xl">
@@ -896,7 +926,7 @@
                 if (data.options) {
                     interactionHtml = `<div class="grid grid-cols-1 gap-3 w-full max-w-2xl mt-4">
                         ${data.options.map((opt, i) => `
-                            <button onclick="checkClassicOption(this, ${opt.isCorrect})" class="classic-opt-btn p-4 bg-${color}-800/50 hover:bg-${color}-700 rounded-lg text-lg font-bold transition text-white border border-${color}-500 text-left">
+                            <button onclick="checkClassicOption(this, ${opt.isCorrect})" class="classic-opt-btn p-3 md:p-4 bg-${color}-800/50 hover:bg-${color}-700 rounded-lg text-base md:text-lg font-bold transition text-white border border-${color}-500 text-left">
                                 ${opt.text}
                             </button>
                         `).join('')}
@@ -906,24 +936,24 @@
                 // 檢查是否有答案圖片
                 let answerMediaHtml = '';
                 if (data.answerImage) {
-                    answerMediaHtml = `<img src="${data.answerImage}" class="max-h-64 rounded-lg border-2 border-${color}-400 mt-4 mx-auto shadow-lg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/${isF ? 'F59E0B' : '6366F1'}/ffffff?text=圖片載入失敗'">`;
+                    answerMediaHtml = `<img src="${data.answerImage}" class="max-h-48 md:max-h-64 rounded-lg border-2 border-${color}-400 mt-4 mx-auto shadow-lg w-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/${isF ? 'F59E0B' : '6366F1'}/ffffff?text=圖片載入失敗'">`;
                 }
 
                 content = `
-                    <div class="p-6 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
+                    <div class="p-4 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
                         ${closeBtn}
-                        <h3 class="text-3xl font-bold ${textColor} mb-4">${category.name} - ${label}</h3>
+                        <h3 class="text-xl md:text-3xl font-bold ${textColor} mb-4">${category.name} - ${label}</h3>
                         
-                        <div class="bg-gray-900 p-6 rounded-xl border-2 ${borderColor}/50 mb-6 w-full max-w-3xl shadow-xl flex flex-col items-center">
-                            <p class="text-2xl md:text-3xl font-black text-white whitespace-pre-line leading-relaxed mb-4">${data.question || '主持人自由出題'}</p>
+                        <div class="bg-gray-900 p-4 md:p-6 rounded-xl border-2 ${borderColor}/50 mb-6 w-full max-w-3xl shadow-xl flex flex-col items-center">
+                            <p class="text-xl md:text-3xl font-black text-white whitespace-pre-line leading-relaxed mb-4">${data.question || '主持人自由出題'}</p>
                             ${data.requirement ? `<p class="text-lg font-bold text-red-400 border-t border-gray-700 pt-2 w-full">${data.requirement}</p>` : ''}
                             ${mediaHtml}
                             ${interactionHtml}
                         </div>
 
-                        <div id="answer-box" class="hidden w-full max-w-3xl ${bgColor} p-6 rounded-lg border ${borderColor} mb-4 animate-expand">
-                            <p class="text-xl text-${color}-200 font-bold mb-2">正確答案</p>
-                            <p class="text-3xl font-bold text-white whitespace-pre-line">${data.answerText || ''}</p>
+                        <div id="answer-box" class="hidden w-full max-w-3xl ${bgColor} p-4 md:p-6 rounded-lg border ${borderColor} mb-4 animate-expand">
+                            <p class="text-lg md:text-xl text-${color}-200 font-bold mb-2">正確答案</p>
+                            <p class="text-2xl md:text-3xl font-bold text-white whitespace-pre-line">${data.answerText || ''}</p>
                             ${data.from ? `<p class="text-sm text-gray-400 mt-2">${data.from}</p>` : ''}
                             ${answerMediaHtml}
                         </div>
@@ -979,46 +1009,70 @@
             }
         }
         
-        // --- 新增：經典/本土歌 選擇題互動邏輯 ---
+        // --- 修改後：經典/本土歌 選擇題互動邏輯 (答錯可重試) ---
         window.checkClassicOption = function(btn, isCorrect) {
-            // 1. 鎖定所有按鈕，避免重複點擊
+            // 1. 取得父容器 (選項列表)
             const parent = btn.parentElement;
-            Array.from(parent.children).forEach(child => {
-                child.disabled = true; // 鎖定
-                child.classList.add('cursor-not-allowed', 'opacity-50'); // 變灰
-                if (child === btn) {
-                    child.classList.remove('opacity-50');
-                    child.classList.add('opacity-100');
-                }
-            });
-
-            // 2. 顯示按鈕本身的對錯樣式
-            if (isCorrect) {
-                btn.classList.add('bg-green-600', 'ring-4', 'ring-green-300', 'scale-105');
-                btn.innerHTML += ' <i data-lucide="check-circle" class="inline w-6 h-6 ml-2"></i>';
-            } else {
-                btn.classList.add('bg-red-600', 'ring-4', 'ring-red-300');
-                btn.innerHTML += ' <i data-lucide="x-circle" class="inline w-6 h-6 ml-2"></i>';
+            
+            // 2. 清除舊的錯誤提示 (如果有的話)
+            const existingFeedback = parent.nextElementSibling;
+            if(existingFeedback && existingFeedback.id === 'error-feedback') {
+                existingFeedback.remove();
             }
+
+            if (isCorrect) {
+                // --- 答對邏輯 ---
+                
+                // 1. 標記按鈕為綠色
+                btn.classList.add('!bg-green-600', '!border-green-400', 'ring-4', 'ring-green-300', 'scale-105', 'z-10');
+                btn.innerHTML += ' <i data-lucide="check-circle" class="inline w-5 h-5 ml-2"></i>';
+
+                // 2. 鎖定所有按鈕 (遊戲結束)
+                Array.from(parent.children).forEach(child => {
+                    child.disabled = true;
+                    child.classList.remove('hover:bg-gray-600', 'hover:scale-105'); // 移除 hover 效果
+                    if (child !== btn) {
+                        child.classList.add('opacity-40', 'cursor-not-allowed', 'blur-[1px]');
+                    }
+                });
+
+                // 3. 顯示答案區塊
+                const answerBox = document.getElementById('answer-box');
+                const showAnswerBtn = document.getElementById('show-answer-btn'); 
+                
+                // 隱藏原本的「看答案」按鈕 (如果是 E/F 類別)
+                if(showAnswerBtn) showAnswerBtn.classList.add('hidden');
+
+                // 在答案區塊頂部加入「答對了」標題
+                if(!answerBox.querySelector('.success-header')) {
+                    const resultHeader = document.createElement('div');
+                    resultHeader.className = `success-header text-2xl md:text-4xl font-black mb-4 text-green-400 animate-bounce-slow`;
+                    resultHeader.innerHTML = '🎉 答對了！';
+                    answerBox.insertBefore(resultHeader, answerBox.firstChild);
+                }
+
+                // 顯示
+                answerBox.classList.remove('hidden');
+                
+            } else {
+                // --- 答錯邏輯 ---
+                
+                // 1. 標記按鈕為紅色並禁用 (避免重複點選同一個錯誤答案)
+                btn.classList.add('!bg-red-600', '!border-red-400', 'opacity-70', 'cursor-not-allowed');
+                btn.disabled = true;
+
+                // 2. 顯示錯誤訊息 (不顯示答案)
+                const feedback = document.createElement('div');
+                feedback.id = "error-feedback";
+                feedback.className = "text-xl font-bold text-red-500 mt-4 bg-black/60 px-6 py-2 rounded-full border border-red-500/50 shadow-lg animate-pulse";
+                feedback.innerHTML = '<i data-lucide="alert-circle" class="inline w-5 h-5 mr-2"></i> 答案不正確，請再試一次';
+                
+                // 插入在選項區域下方
+                parent.after(feedback);
+            }
+            
+            // 重新渲染圖示
             lucide.createIcons();
-
-            // 3. 處理答案區顯示
-            const answerBox = document.getElementById('answer-box');
-            const showAnswerBtn = document.getElementById('show-answer-btn');
-            
-            // 隱藏「揭曉答案」按鈕
-            if(showAnswerBtn) showAnswerBtn.classList.add('hidden');
-
-            // 準備結果標題
-            const resultHeader = document.createElement('div');
-            resultHeader.className = `text-4xl font-black mb-4 ${isCorrect ? 'text-green-400' : 'text-red-400'} animate-bounce-slow`;
-            resultHeader.innerHTML = isCorrect ? '🎉 答對了！' : '❌ 答錯了！';
-            
-            // 將結果標題插入到 Answer Box 最前面
-            answerBox.insertBefore(resultHeader, answerBox.firstChild);
-
-            // 顯示 Answer Box
-            answerBox.classList.remove('hidden');
         }
 
         // --- 頁面渲染函式 ---
@@ -1092,39 +1146,39 @@
             }, 10);
             
             modalContent.innerHTML = `
-                <div class="space-y-4 p-6 pt-10">
-                    <h3 class="text-4xl font-bold text-center text-white text-shadow mb-6">選擇遊戲模式</h3>
+                <div class="space-y-4 p-4 md:p-6 pt-10">
+                    <h3 class="text-3xl md:text-4xl font-bold text-center text-white text-shadow mb-6">選擇遊戲模式</h3>
                     
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Red Ball Game Card -->
-                        <div class="card-container h-48 w-full" onclick="handleMenuCardClick(this, 'red')">
+                        <div class="card-container h-40 md:h-48 w-full" onclick="handleMenuCardClick(this, 'red')">
                             <!-- Front (Mystery) -->
                             <div class="card-face card-front bg-gray-800 border-4 border-gray-600 shadow-xl flex flex-col items-center justify-center group hover:border-gray-400 transition-colors">
-                                <span class="text-6xl animate-pulse text-gray-500">?</span>
+                                <span class="text-5xl md:text-6xl animate-pulse text-gray-500">?</span>
                                 <span class="text-sm text-gray-400 mt-2 font-bold group-hover:text-white">點擊揭曉</span>
                             </div>
                             <!-- Back (Revealed) -->
                             <div class="card-face card-back !bg-red-600 !border-red-400 shadow-xl flex items-center justify-center space-x-4">
-                                <span class="text-5xl">🔴</span>
+                                <span class="text-4xl md:text-5xl">🔴</span>
                                 <div class="text-left">
-                                    <div class="text-2xl font-black">紅白拳王爭霸戰</div>
+                                    <div class="text-xl md:text-2xl font-black">紅白拳王爭霸戰</div>
                                     <div class="text-sm opacity-80">點擊開始</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- White Ball Game Card -->
-                        <div class="card-container h-48 w-full" onclick="handleMenuCardClick(this, 'white')">
+                        <div class="card-container h-40 md:h-48 w-full" onclick="handleMenuCardClick(this, 'white')">
                              <!-- Front (Mystery) -->
                             <div class="card-face card-front bg-gray-800 border-4 border-gray-600 shadow-xl flex flex-col items-center justify-center group hover:border-gray-400 transition-colors">
-                                <span class="text-6xl animate-pulse text-gray-500">?</span>
+                                <span class="text-5xl md:text-6xl animate-pulse text-gray-500">?</span>
                                 <span class="text-sm text-gray-400 mt-2 font-bold group-hover:text-white">點擊揭曉</span>
                             </div>
                             <!-- Back (Revealed) -->
                             <div class="card-face card-back !bg-white !text-gray-900 !border-gray-300 shadow-xl flex items-center justify-center space-x-4">
-                                <span class="text-5xl">⚪</span>
+                                <span class="text-4xl md:text-5xl">⚪</span>
                                 <div class="text-left">
-                                    <div class="text-2xl font-black">紅白大歌星</div>
+                                    <div class="text-xl md:text-2xl font-black">紅白大歌星</div>
                                     <div class="text-sm opacity-80">點擊開始</div>
                                 </div>
                             </div>
@@ -1196,7 +1250,7 @@
 
 
             appContainer.innerHTML = `
-                <div class="w-full max-w-lg md:max-w-xl mx-auto flex flex-col items-center justify-center py-10 min-h-screen relative">
+                <div class="w-full max-w-lg md:max-w-xl mx-auto flex flex-col items-center justify-center py-10 min-h-screen relative px-4">
                     
                     <!-- 新增：返回首頁按鈕 -->
                     <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
@@ -1205,25 +1259,25 @@
                     </button>
                     
                     <!-- 步驟導覽卡片 (符合截圖主體) -->
-                    <div class="w-full bg-gray-800/90 rounded-xl shadow-2xl p-8 border border-gray-700 mb-8 flex flex-col items-center transition transform pulse-once">
+                    <div class="w-full bg-gray-800/90 rounded-xl shadow-2xl p-6 md:p-8 border border-gray-700 mb-8 flex flex-col items-center transition transform pulse-once">
                         
                         <!-- 頂部資訊 -->
                         <div class="text-center mb-8">
                             <div class="flex items-center justify-center text-gray-300 mb-2">
                                 <i data-lucide="disc" class="w-4 h-4 mr-2 text-white"></i>
-                                <span class="text-xl font-bold">遊戲流程說明 (${currentRedStep + 1}/${totalSteps})</span>
+                                <span class="text-lg md:text-xl font-bold">遊戲流程說明 (${currentRedStep + 1}/${totalSteps})</span>
                             </div>
-                            <h2 class="text-lg font-semibold text-red-400">
+                            <h2 class="text-base md:text-lg font-semibold text-red-400">
                                 紅白拳王爭霸戰
                             </h2>
                         </div>
 
                         <!-- 步驟內容卡片 (更深色背景) -->
-                        <div class="w-full bg-gray-900/70 p-8 rounded-lg mb-8 shadow-xl">
-                            <h3 class="text-3xl font-black text-red-500 mb-4 text-center">
+                        <div class="w-full bg-gray-900/70 p-6 md:p-8 rounded-lg mb-8 shadow-xl">
+                            <h3 class="text-2xl md:text-3xl font-black text-red-500 mb-4 text-center">
                                 Step ${currentRedStep + 1} | ${step.title}
                             </h3>
-                            <p class="text-lg text-gray-300 text-center whitespace-pre-line">${step.description}</p>
+                            <p class="text-base md:text-lg text-gray-300 text-center whitespace-pre-line">${step.description}</p>
                         </div>
 
                         <!-- 導航按鈕 -->
@@ -1282,9 +1336,9 @@
                     <div id="action-card-${action.id}" class="card-container h-[400px]" onclick="flipActionCard(${action.id})">
                         <!-- Front Face: Name and Flip Button -->
                         <div class="card-face card-front ${bg} p-6 border-4 ${border} hover:shadow-2xl">
-                            <span class="text-8xl">${action.emoji}</span>
+                            <span class="text-7xl md:text-8xl">${action.emoji}</span>
                             <div class="mt-6 text-center">
-                                <p class="text-4xl font-black">${action.name}</p>
+                                <p class="text-3xl md:text-4xl font-black">${action.name}</p>
                                 <button class="mt-4 px-4 py-2 bg-black/30 rounded-full font-bold transition text-white hover:bg-black/50">
                                     點擊翻牌
                                 </button>
@@ -1295,13 +1349,13 @@
                         <div class="card-face card-back bg-gray-900/90 p-4 border-4 ${border} overflow-hidden">
                             <div class="flex flex-col items-center justify-start w-full h-full text-center py-2">
                                 <img src="${action.actionImage}" 
-                                     class="w-full h-auto max-h-64 object-contain rounded-lg border-2 ${border} mb-4 shadow-lg" 
+                                     class="w-full h-auto max-h-48 md:max-h-64 object-contain rounded-lg border-2 ${border} mb-4 shadow-lg" 
                                      alt="動作示範圖: ${action.name}"
                                      onerror="this.onerror=null; this.src='https://placehold.co/200x300/4B5563/ffffff?text=直式圖片載入失敗'">
                                 
                                 <div class="p-2 w-full text-center border-t border-gray-700 pt-3 flex-1 flex items-center justify-center">
                                     <!-- 簡化為一句話 -->
-                                    <p class="text-lg font-semibold text-white">${action.instruction}</p>
+                                    <p class="text-base md:text-lg font-semibold text-white">${action.instruction}</p>
                                 </div>
                             </div>
                         </div>
@@ -1310,7 +1364,7 @@
             }).join('');
 
             appContainer.innerHTML = `
-                <div class="w-full flex flex-col items-center py-10 relative min-h-screen">
+                <div class="w-full flex flex-col items-center py-10 relative min-h-screen px-4">
                     
                     <!-- 新增：返回首頁按鈕 -->
                     <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
@@ -1320,13 +1374,13 @@
                     
                     <!-- 拳王動作教學 標題 -->
                     <div class="bg-black/80 rounded-full px-6 py-3 mb-10 shadow-2xl flex items-center animate-bounce-slow">
-                        <span class="text-3xl font-black text-white flex items-center">
-                            <span class="text-red-500 text-6xl mr-3 leading-none">🔴</span> 拳王動作教學
+                        <span class="text-2xl md:text-3xl font-black text-white flex items-center">
+                            <span class="text-red-500 text-5xl md:text-6xl mr-3 leading-none">🔴</span> 拳王動作教學
                         </span>
                     </div>
 
                     <!-- 三張動作卡片 (使用 sm:grid-cols-3 確保手機上直列，桌面橫列) -->
-                    <div class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-3 gap-6 px-4 mb-12">
+                    <div class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
                         ${actionCardsHtml}
                     </div>
 
@@ -1382,7 +1436,7 @@
 
 
             appContainer.innerHTML = `
-                <div class="w-full max-w-lg md:max-w-xl mx-auto flex flex-col items-center justify-center py-10 min-h-screen relative">
+                <div class="w-full max-w-lg md:max-w-xl mx-auto flex flex-col items-center justify-center py-10 min-h-screen relative px-4">
                     
                     <!-- 新增：返回首頁按鈕 -->
                     <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
@@ -1391,25 +1445,25 @@
                     </button>
                     
                     <!-- 步驟導覽卡片 (符合截圖主體) -->
-                    <div class="w-full bg-gray-800/90 rounded-xl shadow-2xl p-8 border border-gray-700 mb-8 flex flex-col items-center transition transform pulse-once">
+                    <div class="w-full bg-gray-800/90 rounded-xl shadow-2xl p-6 md:p-8 border border-gray-700 mb-8 flex flex-col items-center transition transform pulse-once">
                         
                         <!-- 頂部資訊 -->
                         <div class="text-center mb-8">
                             <div class="flex items-center justify-center text-gray-300 mb-2">
                                 <i data-lucide="disc" class="w-4 h-4 mr-2 text-white"></i>
-                                <span class="text-xl font-bold">遊戲流程說明 (${currentWhiteStep + 1}/${totalSteps})</span>
+                                <span class="text-lg md:text-xl font-bold">遊戲流程說明 (${currentWhiteStep + 1}/${totalSteps})</span>
                             </div>
-                            <h2 class="text-lg font-semibold text-red-400">
+                            <h2 class="text-base md:text-lg font-semibold text-red-400">
                                 紅白大歌星 (搶答模式)
                             </h2>
                         </div>
 
                         <!-- 步驟內容卡片 (更深色背景，符合截圖中的內層卡片) -->
-                        <div class="w-full bg-gray-900/70 p-8 rounded-lg mb-8 shadow-xl">
-                            <h3 class="text-3xl font-black text-yellow-500 mb-4 text-center">
+                        <div class="w-full bg-gray-900/70 p-6 md:p-8 rounded-lg mb-8 shadow-xl">
+                            <h3 class="text-2xl md:text-3xl font-black text-yellow-500 mb-4 text-center">
                                 Step ${currentWhiteStep + 1} | ${step.title}
                             </h3>
-                            <p class="text-lg text-gray-300 text-center whitespace-pre-line">${step.description}</p>
+                            <p class="text-base md:text-lg text-gray-300 text-center whitespace-pre-line">${step.description}</p>
                         </div>
 
                         <!-- 導航按鈕 -->
@@ -1465,7 +1519,7 @@
             gridHtml += CATEGORY_COLORS.map(cat => `
                 <div class="category-column-header-cell ${cat.header_bg} ${cat.text} shadow-lg border-b-4 border-black/20">
                     <div class="flex flex-col items-center">
-                        <i data-lucide="${cat.icon}" class="w-4 h-4 mb-0.5"></i>
+                        <i data-lucide="${cat.icon}" class="w-4 h-4 mb-0.5 hidden md:block"></i> <!-- 手機版隱藏 icon 省空間 -->
                         <span>${cat.name}</span>
                     </div>
                 </div>
@@ -1482,10 +1536,10 @@
                     gridHtml += `
                         <div id="card-${card.id}" class="card-container" onclick="flipCard(${card.id})">
                             <div class="card-face card-front ${cat.bg} ${cat.text} hover:${cat.hover} transition duration-300">
-                                <span class="text-3xl font-black drop-shadow-md">${label}</span>
+                                <span class="text-xl md:text-3xl font-black drop-shadow-md">${label}</span>
                             </div>
                             <div class="card-face card-back">
-                                <i data-lucide="check" class="w-8 h-8 text-green-400"></i>
+                                <i data-lucide="check" class="w-6 h-6 md:w-8 md:h-8 text-green-400"></i>
                                 <span class="text-xs font-bold text-green-400 mt-1">Done</span>
                             </div>
                         </div>
@@ -1493,28 +1547,32 @@
                 }
             }
 
-
+            // RWD 修改：加入 overflow-x-auto 容器
             appContainer.innerHTML = `
-                <div class="w-full flex flex-col items-center max-w-7xl pt-4 px-2 relative"> <!-- 加上 relative 讓 Home 按鈕定位 -->
+                <div class="w-full flex flex-col items-center max-w-7xl pt-4 px-2 relative h-full justify-center"> <!-- 加上 relative 讓 Home 按鈕定位 -->
                     <!-- Home button fixed to the top right of the container (使用新的樣式) -->
-                    <button onclick="renderHomePage()" class="absolute top-4 right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
+                    <button onclick="renderHomePage()" class="absolute top-2 right-2 md:top-4 md:right-4 z-20 px-3 py-1 bg-gray-800/80 hover:bg-gray-700 text-white rounded-lg text-sm border border-gray-600 shadow-lg transition flex items-center space-x-1">
                         <i data-lucide="home" class="w-4 h-4"></i>
                         <span>首頁</span>
                     </button>
                     
                     <!-- Centered Title (新風格) -->
-                    <div class="bg-black/80 rounded-full px-8 py-3 mb-6 shadow-2xl flex items-center animate-bounce-slow">
-                        <span class="text-4xl font-black text-white flex items-center">
-                            <span class="text-red-500 text-6xl mr-3 leading-none">⚪</span> 紅白大歌星
+                    <div class="bg-black/80 rounded-full px-6 md:px-8 py-2 md:py-3 mb-4 md:mb-6 shadow-2xl flex items-center animate-bounce-slow mt-8 md:mt-0">
+                        <span class="text-2xl md:text-4xl font-black text-white flex items-center">
+                            <span class="text-red-500 text-4xl md:text-6xl mr-2 md:mr-3 leading-none">⚪</span> 紅白大歌星
                         </span>
                     </div>
                     
-                    <p class="text-gray-300 text-sm mb-3 text-shadow text-center">
+                    <p class="text-gray-300 text-xs md:text-sm mb-3 text-shadow text-center">
+                        <span class="md:hidden text-yellow-400 animate-pulse">← 左右滑動查看所有題目 →</span><br class="md:hidden">
                         30 張卡片等待你的選擇，翻開一張，開啟驚喜！
                     </p>
 
-                    <div id="game-board-grid" class="mb-4">
-                        ${gridHtml}
+                    <!-- RWD 重點：包覆層加上水平捲軸 -->
+                    <div class="w-full overflow-x-auto pb-4 hide-scrollbar px-1">
+                        <div id="game-board-grid" class="mb-4 mx-auto">
+                            ${gridHtml}
+                        </div>
                     </div>
                 </div>
             `;
