@@ -208,7 +208,7 @@
 
     <!-- 全螢幕背景影片 -->
     <video autoplay loop muted playsinline id="video-background">
-        <source src="https://lochoive-code.github.io/video/redwhite-game_01.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
+        <source src="https://lochoive-code.github.io/video/redwhite-game.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
     </video>
 
     <!-- 半透明遮罩 (用於動態 dimming effect，初始透明) -->
@@ -236,7 +236,7 @@
     <script>
         // --- 資料設定 ---
         const VIDEO_URLS = {
-            HOME: "https://lochoive-code.github.io/video/redwhite-game_01.mp4",
+            HOME: "https://lochoive-code.github.io/video/redwhite-game.mp4",
             GAME: "https://lochoive-code.github.io/video/redwhite-game_02.mp4" 
         };
 
@@ -316,7 +316,7 @@
             { name: "題目 A1", song: "Love Story", artist: "Taylor Swift", audio: "https://lochoive-code.github.io/redwhitegames/a1-love-story.mp3" },
             { name: "題目 A2", song: "隱形的翅膀", artist: "張韶涵", audio: "https://lochoive-code.github.io/redwhitegames/a2-wings.mp3" },
             { name: "題目 A3", song: "我是一隻小小鳥", artist: "趙傳", audio: "https://lochoive-code.github.io/redwhitegames/a3-birdy.mp3" },
-            { name: "題目 A4", song: "Rolling in the deep", artist: "Adele", audio: "https://lochoive-code.github.io/redwhitegames/a4-Rolling-in-the-deep.mp3" },
+            { name: "題目 A4", song: "Rolling in the deep", artist: "Adele", audio: "https://lochoive-code.github.io/redwhitegames/a4-question-music_rev.mp3" },
             { name: "題目 A5", song: "家後", artist: "江蕙", audio: "https://lochoive-code.github.io/redwhitegames/a5-question-music_REV.mp3" },
         ];
         
@@ -326,7 +326,7 @@
             { name: "B2", question: "心甘情願感染你的氣息...", answer: "我愛你有幾分", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
             { name: "B3", question: "背棄了理想，誰人都可以", answer: "哪會怕有一天只你共我", hint: "★★★★★★★★★★ (10 字)", from: "Beyond《海闊天空》", audio: "https://lochoive-code.github.io/redwhitegames/b3-hksong.mp3" },
             { name: "B4", question: "若分開...", answer: "已經不知何時何日才會通甲你來相逢", hint: "★★★★★★★★★★★★★★★★ (16 字)", from: "郭桂彬與黃乙玲《海波浪》", audio: "https://lochoive-code.github.io/redwhitegames/b4-wave.mp3" },
-            { name: "B5", question: "對酒當歌，唱出心中喜悅...", answer: "轟轟烈烈，把握青春年華", hint: "★★★★★★★★★★ (10 字)", from: "動力火車《當》", audio: "https://lochoive-code.github.io/redwhitegames/b5_question_music_REV.mp3" }
+            { name: "B5", question: "對酒當歌，唱出心中喜悅...", answer: "轟轟烈烈，把握青春年華", hint: "★★★★★★★★★★ (10 字)", from: "動力火車《當》", audio: "https://lochoive-code.github.io/redwhitegames/b5_question_music_rev2.mp3" }
         ];
 
         // C 類別：已更新為使用者要求內容
@@ -351,7 +351,7 @@
                 name: "C2", 
                 type: "audio", 
                 question: "請問這首歌是哪個產品的廣告歌？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-music.mp3", // 音訊 Placeholder
+                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-video-rev.mp4", // 音訊 Placeholder
                 answerType: "video", 
                 answerText: "黑人牙膏",
                 answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" // 影片答案 Placeholder
@@ -401,7 +401,7 @@
             { 
                 type: 'audio', 
                 question: '請問這首歌是哪位歌手唱的？', 
-                audio: 'https://lochoive-code.github.io/redwhitegames/d2-question-music.mp3', // 音訊 Placeholder 
+                audio: 'https://lochoive-code.github.io/redwhitegames/d2-question-music-rev.mp3', // 音訊 Placeholder 
                 answer: '黃妃' 
             },
             // D3 (圖片題 + 文字問答)
@@ -422,7 +422,7 @@
             { 
                 type: 'mcq', 
                 question: '<Let It Be> 是哪個樂團演唱的經典歌曲？', 
-                audio: 'https://lochoive-code.github.io/redwhitegames/f5-question-music.mp3', // 音訊 Placeholder
+                audio: 'https://lochoive-code.github.io/redwhitegames/d5-question-music-rev.mp3', // 音訊 Placeholder
                 options: [
                     { text: 'A：披頭四（The Beatles）', isCorrect: true },
                     { text: 'B：皇后樂隊（Queen）', isCorrect: false },
@@ -496,7 +496,7 @@
                 name: "F1 (我幫你選)", 
                 type: "mcq_audio", 
                 question: "世界名曲《天鵝湖》的作曲家是哪一位？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/f1-quesiton-music.mp3", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f1-quesiton-music_REV.mp3", 
                 options: [
                     { text: "A. 巴哈", isCorrect: false },
                     { text: "B. 蕭邦", isCorrect: false },
@@ -515,7 +515,7 @@
                 name: "F3 (我幫你選)", 
                 type: "mcq_audio", 
                 question: "請問這首歌是哪部偶像劇的主題曲？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/f3-quesiton-music.mp3", 
+                audio: "https://lochoive-code.github.io/redwhitegames/f3-quesiton-music-REV.mp3", 
                 options: [
                     { text: "A. 流星花園", isCorrect: true },
                     { text: "B. MVP情人", isCorrect: false },
