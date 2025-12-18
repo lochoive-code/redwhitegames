@@ -201,6 +201,16 @@
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
         }
+        
+        /* 音樂按鈕特效 */
+        .music-btn-pulse {
+            animation: pulse-music 2s infinite;
+        }
+        @keyframes pulse-music {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
 
     </style>
 </head>
@@ -210,6 +220,22 @@
     <video autoplay loop muted playsinline id="video-background">
         <source src="https://lochoive-code.github.io/video/redwhite-game.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
     </video>
+    
+    <!-- 背景音樂 (請將 src 替換為您的音樂檔案連結) -->
+    <!-- 這裡預設使用一個免費的範例音樂作為測試 -->
+    <audio id="bg-music" loop>
+        <source src="https://lochoive-code.github.io/redwhitegames/bgm.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- 音樂控制按鈕 (固定左上角) -->
+    <button id="music-toggle-btn" onclick="toggleMusic()" class="fixed top-4 left-4 z-50 p-3 bg-gray-900/80 hover:bg-gray-800 text-white rounded-full border border-gray-500 shadow-xl transition-all duration-300 flex items-center justify-center group" title="切換背景音樂">
+        <div class="relative w-6 h-6">
+            <!-- 音樂播放中圖示 -->
+            <i id="icon-music-on" data-lucide="music" class="w-6 h-6 text-green-400 hidden"></i>
+            <!-- 音樂靜音圖示 -->
+            <i id="icon-music-off" data-lucide="volume-x" class="w-6 h-6 text-gray-400"></i>
+        </div>
+    </button>
 
     <!-- 半透明遮罩 (用於動態 dimming effect，初始透明) -->
     <div id="dimming-overlay" class="fixed inset-0 bg-black z-0 opacity-0 transition-opacity duration-500"></div>
@@ -236,7 +262,7 @@
     <script>
         // --- 資料設定 ---
         const VIDEO_URLS = {
-            HOME: "https://lochoive-code.github.io/video/redwhite-game.mp4",
+            HOME: "https://lochoive-code.github.io/video/redwhite-game_01.mp4",
             GAME: "https://lochoive-code.github.io/video/redwhite-game_02.mp4" 
         };
 
@@ -245,7 +271,7 @@
             { header_bg: 'bg-blue-600', bg: 'bg-blue-500/80', hover: 'bg-blue-500', text: 'text-white', name: '歌詞填空', icon: 'mic' }, // B
             { header_bg: 'bg-green-600', bg: 'bg-green-500/80', hover: 'bg-green-500', text: 'text-white', name: '主題/廣告歌', icon: 'megaphone' }, // C
             { header_bg: 'bg-purple-600', bg: 'bg-purple-500/80', hover: 'bg-purple-500', text: 'text-white', name: '快問快答', icon: 'zap' }, // D
-            { header_bg: 'bg-indigo-600', bg: 'bg-indigo-500/80', hover: 'bg-indigo-500', text: 'text-white', name: '經典/本土歌', icon: 'book-open' }, // E
+            { header_bg: 'bg-indigo-600', bg: 'bg-indigo-500/80', hover: 'bg-indigo-500', text: 'text-white', name: '經典電影', icon: 'book-open' }, // E
             { header_bg: 'bg-yellow-500', bg: 'bg-yellow-400/80', hover: 'bg-yellow-400', text: 'text-gray-900', name: '我幫你選', icon: 'wand' } // F
         ];
         
@@ -323,7 +349,7 @@
         // B 類別：新增 audio 欄位 (已包含音樂連結)
         const GAP_FILL_ANSWERS = [
             { name: "B1", question: "原來你是我最想留住的幸運...", answer: "原來我們和愛情曾經靠得那麼近", hint: "★★★★★★★★★★★★★★ (14 字)", from: "田馥甄《小幸運》", audio: "https://lochoive-code.github.io/redwhitegames/b1-lucky.mp3" },
-            { name: "B2", question: "心甘情願感染你的氣息...", answer: "我愛你有幾分", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
+            { name: "B2", question: "心甘情願感染你的氣息...", answer: "人生幾何能夠得到知己", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
             { name: "B3", question: "背棄了理想，誰人都可以", answer: "哪會怕有一天只你共我", hint: "★★★★★★★★★★ (10 字)", from: "Beyond《海闊天空》", audio: "https://lochoive-code.github.io/redwhitegames/b3-hksong.mp3" },
             { name: "B4", question: "若分開...", answer: "已經不知何時何日才會通甲你來相逢", hint: "★★★★★★★★★★★★★★★★ (16 字)", from: "郭桂彬與黃乙玲《海波浪》", audio: "https://lochoive-code.github.io/redwhitegames/b4-wave.mp3" },
             { name: "B5", question: "對酒當歌，唱出心中喜悅...", answer: "轟轟烈烈，把握青春年華", hint: "★★★★★★★★★★ (10 字)", from: "動力火車《當》", audio: "https://lochoive-code.github.io/redwhitegames/b5_question_music_rev2.mp3" }
@@ -351,7 +377,7 @@
                 name: "C2", 
                 type: "audio", 
                 question: "請問這首歌是哪個產品的廣告歌？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-video-rev.mp4", // 音訊 Placeholder
+                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-music.mp3", // 音訊 Placeholder
                 answerType: "video", 
                 answerText: "黑人牙膏",
                 answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" // 影片答案 Placeholder
@@ -460,9 +486,9 @@
                 question: "請問這首歌是哪部電影的主題曲？", 
                 audio: "https://lochoive-code.github.io/redwhitegames/e3-quesiton-music.mp3", 
                 options: [
-                    { text: "A：銀翼殺手 Blade Runner", isCorrect: false },
+                    { text: "A：哈利波特 消失的密室 Harry Poter", isCorrect: false },
                     { text: "B：終極保鑣 The Bodyguard", isCorrect: true },
-                    { text: "C：捍衛戰士 Top Gun", isCorrect: false }
+                    { text: "C：鐵達尼號 Titanic", isCorrect: false }
                 ],
                 answerText: "終極保鑣 The Bodyguard" 
             },
@@ -560,13 +586,71 @@
                 v.play().catch(()=>{});
             }
         }
-
+        
+        // --- 音樂控制功能 ---
+        
+        // 修改：停止所有音訊，但排除背景音樂
         window.stopAllAudio = function() {
-            // 確保停止所有音訊和影片（除了背景影片）
+            // 確保停止所有音訊和影片（除了背景影片和背景音樂）
             document.querySelectorAll('audio, video').forEach(el => {
-                if(el.id !== 'video-background') { el.pause(); el.currentTime = 0; }
+                // 排除 background video 和 bg-music
+                if(el.id !== 'video-background' && el.id !== 'bg-music') { 
+                    el.pause(); 
+                    el.currentTime = 0; 
+                }
             });
             clearInterval(fastQATimerInterval);
+        }
+        
+        // 控制背景音樂開關
+        window.toggleMusic = function() {
+            const audio = document.getElementById('bg-music');
+            const btn = document.getElementById('music-toggle-btn');
+            const onIcon = document.getElementById('icon-music-on');
+            const offIcon = document.getElementById('icon-music-off');
+            
+            if (audio.paused) {
+                // 嘗試播放
+                audio.play().then(() => {
+                    onIcon.classList.remove('hidden');
+                    offIcon.classList.add('hidden');
+                    btn.classList.add('music-btn-pulse', 'border-green-400'); // 加入視覺回饋
+                    btn.classList.remove('border-gray-500');
+                }).catch(e => {
+                    console.log("播放失敗", e);
+                    alert("無法自動播放音樂，請檢查瀏覽器設定或確認檔案連結有效。");
+                });
+            } else {
+                // 暫停
+                audio.pause();
+                onIcon.classList.add('hidden');
+                offIcon.classList.remove('hidden');
+                btn.classList.remove('music-btn-pulse', 'border-green-400');
+                btn.classList.add('border-gray-500');
+            }
+            // 重新渲染圖示
+            lucide.createIcons();
+        }
+        
+        // 自動播放嘗試 (需要使用者互動後觸發)
+        function tryPlayBackgroundMusic() {
+            const audio = document.getElementById('bg-music');
+            const onIcon = document.getElementById('icon-music-on');
+            const offIcon = document.getElementById('icon-music-off');
+            const btn = document.getElementById('music-toggle-btn');
+            
+            if(audio.paused) {
+                audio.play().then(() => {
+                    // 如果成功播放，更新圖示
+                    onIcon.classList.remove('hidden');
+                    offIcon.classList.add('hidden');
+                    btn.classList.add('music-btn-pulse', 'border-green-400');
+                    btn.classList.remove('border-gray-500');
+                }).catch(() => {
+                    // 自動播放失敗是正常的 (瀏覽器策略)，保持靜音狀態即可
+                    console.log("Auto-play blocked, waiting for user interaction.");
+                });
+            }
         }
         
         // 新增：關閉 Modal 並返回首頁
@@ -607,6 +691,24 @@
         function openContentModal(card) {
             stopAllAudio(); 
 
+            // --- 新增：進入題目時，強制暫停背景音樂 (避免干擾) ---
+            const bgMusic = document.getElementById('bg-music');
+            if (bgMusic && !bgMusic.paused) {
+                bgMusic.pause();
+                // 手動更新左上角音樂按鈕的 UI 為「靜音/暫停」狀態
+                const onIcon = document.getElementById('icon-music-on');
+                const offIcon = document.getElementById('icon-music-off');
+                const btn = document.getElementById('music-toggle-btn');
+                
+                if (onIcon) onIcon.classList.add('hidden');
+                if (offIcon) offIcon.classList.remove('hidden');
+                if (btn) {
+                    btn.classList.remove('music-btn-pulse', 'border-green-400');
+                    btn.classList.add('border-gray-500');
+                }
+            }
+            // ----------------------------------------------------
+
             // 隱藏 Menu Modal 的 Home 按鈕 (因為題目卡片內部有自己的 X 按鈕)
             modalCloseHomeBtn.classList.add('hidden');
 
@@ -631,6 +733,26 @@
 
         window.closeContentModal = function() {
             stopAllAudio();
+
+            // --- 新增：關閉題目卡片（跳回 30 張卡片畫面）時，自動恢復背景音樂 ---
+            const bgMusic = document.getElementById('bg-music');
+            if (bgMusic && bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    // 更新音樂按鈕 UI 為播放狀態
+                    const onIcon = document.getElementById('icon-music-on');
+                    const offIcon = document.getElementById('icon-music-off');
+                    const btn = document.getElementById('music-toggle-btn');
+                    
+                    if (onIcon) onIcon.classList.remove('hidden');
+                    if (offIcon) offIcon.classList.add('hidden');
+                    if (btn) {
+                        btn.classList.add('music-btn-pulse', 'border-green-400');
+                        btn.classList.remove('border-gray-500');
+                    }
+                }).catch(e => console.log("Resume music failed", e));
+            }
+            // ----------------------------------------------------------------
+
             // 執行 Modal 隱藏動畫
             modalWrapper.classList.remove('scale-100', 'opacity-100');
             modalWrapper.classList.add('scale-95', 'opacity-0');
@@ -1135,6 +1257,9 @@
             document.getElementById('video-background').classList.add('video-dimmed');
             dimmingOverlay.classList.remove('opacity-0');
             dimmingOverlay.classList.add('opacity-60');
+            
+            // --- 嘗試自動播放背景音樂 (使用者已互動) ---
+            tryPlayBackgroundMusic();
 
             // 顯示 Menu Modal 的 Home 按鈕
             modalCloseHomeBtn.classList.remove('hidden');
