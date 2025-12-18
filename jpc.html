@@ -372,15 +372,15 @@
                 answerText: "正確答案：B. 愛江山更愛美人",
                 answerVideo: "https://lochoive-code.github.io/redwhitegames/c1-ans-video.mp4" // 影片答案 Placeholder
             },
-            // C2: 廣告歌 (Audio Question, Video Answer)
+            // C2: 廣告歌 (已修改：問題改為影片)
             { 
                 name: "C2", 
-                type: "audio", 
-                question: "請問這首歌是哪個產品的廣告歌？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c2-question-music.mp3", // 音訊 Placeholder
+                type: "video", // 修改為 video 類型
+                question: "請問這支廣告是在宣傳什麼產品？", 
+                video: "https://lochoive-code.github.io/redwhitegames/c2-question-video-rev.mp4", // 影片問題 (需確認連結)
                 answerType: "video", 
                 answerText: "黑人牙膏",
-                answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" // 影片答案 Placeholder
+                answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" 
             },
             // C3: 動漫主題曲 (Audio Question, Image Answer)
             { 
@@ -846,7 +846,7 @@
                 const data = THEME_SONG_ANSWERS[card.row] || {};
                 let mediaHtml = '';
                 
-                // --- 1. 處理問題媒體 (Image / Audio / MCQ Image) ---
+                // --- 1. 處理問題媒體 (Image / Audio / MCQ Image / Video) ---
                 if(data.type === 'image' || data.type === 'mcq_image') {
                     mediaHtml = `
                         <div class="flex flex-col items-center w-full">
@@ -869,6 +869,16 @@
                             <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
                         </p>
                         <audio id="active-audio" controls src="${data.audio}" class="w-full"></audio>
+                    `;
+                } else if (data.type === 'video') {
+                     // C 類別影片 (C2 修改後)
+                     mediaHtml = `
+                        <div class="video-container w-full">
+                            <video id="question-video-${label}" controls src="${data.video}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black mb-2"></video>
+                            <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
+                                <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放影片
+                            </p>
+                        </div>
                     `;
                 }
 
@@ -931,8 +941,8 @@
                 let answerDisplayHtml = '';
                 let questionMediaHtml = '';
                 
-                // 設定計時器秒數：D2(row=1) 和 D5(row=4) 為 10秒，其餘(D1, D3, D4) 為 5秒
-                const timerDuration = (card.row === 1 || card.row === 4) ? 10 : 5;
+                // 設定計時器秒數：全部統一為 10 秒
+                const timerDuration = 10;
 
                 // --- 新增：處理題目區域的媒體 (圖片/音樂) ---
                 if (data.questionImage) {
@@ -943,10 +953,11 @@
                     `;
                 }
                 if (data.audio) {
+                    // 移除 autoplay，並加上特定 ID 供 JS 呼叫
                     questionMediaHtml += `
                         <div class="mt-4 w-full bg-purple-950/50 p-3 rounded border border-purple-500/30">
-                            <audio id="question-audio-${label}" controls autoplay src="${data.audio}" class="w-full mb-2"></audio>
-                            <p class="text-xs text-yellow-500">🔊 音樂已自動播放，若未播放請手動點擊</p>
+                            <audio id="fast-qa-audio" controls src="${data.audio}" class="w-full mb-2"></audio>
+                            <p class="text-xs text-yellow-500">🔊 按下「開始計時」後自動播放</p>
                         </div>
                     `;
                 }
@@ -1100,6 +1111,12 @@
             document.getElementById('qa-start-overlay').classList.add('hidden');
             document.getElementById('qa-interaction-area').classList.remove('hidden');
             
+            // 新增：觸發音訊播放 (如果有 id="fast-qa-audio")
+            const audio = document.getElementById('fast-qa-audio');
+            if (audio) {
+                audio.play().catch(e => console.log("Audio play failed", e));
+            }
+
             let time = duration;
             const timerEl = document.getElementById('timer-display');
             timerEl.innerText = time;
