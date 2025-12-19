@@ -212,6 +212,19 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
+        /* 首頁互動區樣式 */
+        .home-hover-btn {
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        
+        /* 當滑鼠懸停在父容器 (.group) 時，按鈕的狀態 */
+        .group:hover .home-hover-btn {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -263,7 +276,8 @@
         // --- 資料設定 ---
         const VIDEO_URLS = {
             HOME: "https://lochoive-code.github.io/video/redwhite-game_01.mp4",
-            GAME: "https://lochoive-code.github.io/video/redwhite-game_02.mp4" 
+            GAME: "https://lochoive-code.github.io/video/redwhite-game_02.mp4",
+            REVIEW: "https://lochoive-code.github.io/video/2025年度回顧.mp4" // 回顧影片 Placeholder (目前暫用首頁影片)
         };
 
         const CATEGORY_COLORS = [
@@ -378,9 +392,7 @@
                 type: "video", // 修改為 video 類型
                 question: "請問這支廣告是在宣傳什麼產品？", 
                 video: "https://lochoive-code.github.io/redwhitegames/c2-question-video-rev.mp4", // 影片問題 (需確認連結)
-                answerType: "video", 
                 answerText: "黑人牙膏",
-                answerVideo: "https://lochoive-code.github.io/redwhitegames/c2-ans-video.mp4" 
             },
             // C3: 動漫主題曲 (Audio Question, Image Answer)
             { 
@@ -1221,6 +1233,7 @@
 
         // --- 頁面渲染函式 ---
         
+        // 1. 修改後首頁：預設隱藏按鈕，Hover 時顯示三個入口
         function renderHomePage() {
             setVideoBackground(VIDEO_URLS.HOME);
             gameModal.classList.add('hidden'); 
@@ -1234,21 +1247,79 @@
             modalCloseHomeBtn.classList.add('hidden');
 
             appContainer.innerHTML = `
-                <!-- Full-screen interactive wrapper -->
-                <div id="home-wrapper" 
-                    class="absolute inset-0 z-10 flex flex-col items-center justify-end p-8">
+                <!-- Full-screen interaction zone with Hover trigger -->
+                <div id="home-interaction-zone" 
+                     class="absolute inset-0 z-20 flex flex-col items-center justify-center transition-colors duration-700 bg-black/0 hover:bg-black/50 group cursor-pointer">
                     
-                    <div class="flex-grow w-full"></div> <!-- Pushes the button down -->
+                    <!-- 浮現的按鈕群組 -->
+                    <div class="flex flex-col md:flex-row gap-6 md:gap-10 items-center opacity-0 group-hover:opacity-100 transition-all duration-700 transform translate-y-12 group-hover:translate-y-0">
+                        
+                        <!-- 1. 影片回顧 2025 -->
+                        <button onclick="renderVideoReviewPage()" 
+                            class="home-hover-btn flex flex-col items-center justify-center w-40 h-40 md:w-56 md:h-56 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl shadow-2xl border-2 border-purple-400 hover:scale-110 hover:border-white group-hover:delay-100">
+                            <i data-lucide="film" class="w-12 h-12 md:w-16 md:h-16 text-white mb-4"></i>
+                            <span class="text-lg md:text-2xl font-bold text-white">影片回顧 2025</span>
+                        </button>
 
-                    <!-- 按鈕預設可見，移除 btn-hidden 類 -->
-                    <button id="menu-button" 
-                        onclick="renderMenu()" 
-                        class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white text-lg font-bold rounded-full shadow-2xl border-4 border-white animate-pulse-slow">
-                        選擇遊戲模式
-                    </button>
+                        <!-- 2. 選擇遊戲模式 (主要功能) -->
+                        <button onclick="renderMenu()" 
+                            class="home-hover-btn flex flex-col items-center justify-center w-48 h-48 md:w-64 md:h-64 bg-gradient-to-br from-red-600 to-orange-600 rounded-full shadow-2xl border-4 border-white animate-pulse-slow hover:animate-none hover:scale-110 group-hover:delay-200">
+                            <i data-lucide="gamepad-2" class="w-16 h-16 md:w-20 md:h-20 text-white mb-4"></i>
+                            <span class="text-xl md:text-3xl font-black text-white">選擇遊戲模式</span>
+                        </button>
+
+                        <!-- 3. 抽獎 -->
+                        <button onclick="window.open('https://www.jpcco.com/lang/tw', '_blank')" 
+                            class="home-hover-btn flex flex-col items-center justify-center w-40 h-40 md:w-56 md:h-56 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl shadow-2xl border-2 border-yellow-300 hover:scale-110 hover:border-white group-hover:delay-300">
+                            <i data-lucide="ticket" class="w-12 h-12 md:w-16 md:h-16 text-white mb-4"></i>
+                            <span class="text-lg md:text-2xl font-bold text-white">抽獎</span>
+                        </button>
+
+                    </div>
+                    
+                    <p class="absolute bottom-10 text-gray-400/50 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-1000">Hover Screen to Interact</p>
                 </div>
             `;
             
+            lucide.createIcons();
+        }
+
+        // 新增：影片回顧頁面
+        function renderVideoReviewPage() {
+            setVideoBackground(VIDEO_URLS.HOME); // 保持背景或設為全黑
+            // 確保影片變暗
+            document.getElementById('video-background').classList.add('video-dimmed');
+            dimmingOverlay.classList.remove('opacity-0');
+            dimmingOverlay.classList.add('opacity-80'); // 讓背景更暗以凸顯影片
+
+            // 停止首頁背景音樂 (如果有的話)
+            const bgMusic = document.getElementById('bg-music');
+            if(bgMusic) bgMusic.pause();
+
+            appContainer.innerHTML = `
+                <div class="w-full flex flex-col items-center justify-center h-screen relative px-4">
+                    
+                    <!-- 返回首頁按鈕 -->
+                    <button onclick="renderHomePage()" class="absolute top-4 right-4 z-50 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full text-lg border border-gray-600 shadow-lg transition flex items-center space-x-2">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                        <span>關閉</span>
+                    </button>
+
+                    <h2 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-8 animate-pulse-slow">
+                        2025 尾牙精彩回顧
+                    </h2>
+
+                    <!-- 影片播放器容器 -->
+                    <div class="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-700 relative group">
+                        <video autoplay controls class="w-full h-full object-contain">
+                            <source src="${VIDEO_URLS.REVIEW}" type="video/mp4">
+                            您的瀏覽器不支援影片播放。
+                        </video>
+                    </div>
+
+                    <p class="text-gray-400 mt-6 text-center">感謝大家這一年的辛勤付出！</p>
+                </div>
+            `;
             lucide.createIcons();
         }
         
