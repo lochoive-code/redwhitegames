@@ -353,7 +353,7 @@
 
         // --- 題目資料庫 ---
         const MUSIC_ANSWERS = [
-            { name: "題目 A1", song: "Love Story", artist: "Taylor Swift", audio: "https://lochoive-code.github.io/redwhitegames/a1-love-story.mp3" },
+            { name: "題目 A1", song: "Love Story", artist: "Taylor Swift", audio: "https://lochoive-code.github.io/redwhitegames/a1-question-music_REV.mp3" },
             { name: "題目 A2", song: "隱形的翅膀", artist: "張韶涵", audio: "https://lochoive-code.github.io/redwhitegames/a2-wings.mp3" },
             { name: "題目 A3", song: "我是一隻小小鳥", artist: "趙傳", audio: "https://lochoive-code.github.io/redwhitegames/a3-birdy.mp3" },
             { name: "題目 A4", song: "Rolling in the deep", artist: "Adele", audio: "https://lochoive-code.github.io/redwhitegames/a4-question-music_rev.mp3" },
@@ -361,6 +361,7 @@
         ];
         
         // B 類別：新增 audio 欄位 (已包含音樂連結)
+        // 注意：這裡的 hint 欄位在新的邏輯中將被忽略，改為動態生成
         const GAP_FILL_ANSWERS = [
             { name: "B1", question: "原來你是我最想留住的幸運...", answer: "原來我們和愛情曾經靠得那麼近", hint: "★★★★★★★★★★★★★★ (14 字)", from: "田馥甄《小幸運》", audio: "https://lochoive-code.github.io/redwhitegames/b1-lucky.mp3" },
             { name: "B2", question: "心甘情願感染你的氣息...", answer: "人生幾何能夠得到知己", hint: "★★★★★★★★★★ (10 字)", from: "鄧麗君《我只在乎你》", audio: "https://lochoive-code.github.io/redwhitegames/b2-only-care.mp3" },
@@ -384,27 +385,33 @@
                 ],
                 answerType: "video", 
                 answerText: "正確答案：B. 愛江山更愛美人",
-                answerVideo: "https://lochoive-code.github.io/redwhitegames/c1-ans-video.mp4" // 影片答案 Placeholder
+                answerVideo: "https://lochoive-code.github.io/redwhitegames/c1-ans-video.mp4" 
             },
-            // C2: 廣告歌 (已修改：問題改為影片)
+            // C2: 廣告歌 (改為 MCQ Video)
             { 
                 name: "C2", 
-                type: "video", // 修改為 video 類型
-                question: "請問這支廣告是在宣傳什麼產品？", 
-                video: "https://lochoive-code.github.io/redwhitegames/c2-question-video-rev.mp4", // 影片問題 (需確認連結)
-                answerText: "黑人牙膏",
+                type: "mcq_video", // 修改為 mcq_video 類型
+                question: "請問《這段影片》是哪種產品的廣告？", 
+                video: "https://lochoive-code.github.io/redwhitegames/c2-question-video-rev.mp4", 
+                mcq_options: [
+                    { text: "A. 髮蠟", isCorrect: true },
+                    { text: "B. 刮鬍刀", isCorrect: false },
+                    { text: "C. 洗面乳", isCorrect: false }
+                ],
+                answerType: "text", 
+                answerText: "正確答案：A. GATSBY髮蠟",
             },
             // C3: 動漫主題曲 (Audio Question, Image Answer)
             { 
                 name: "C3", 
                 type: "audio", 
-                question: "請問日文歌曲《直到世界的盡頭》是哪部動漫的主題曲？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c3-question-music.mp3", // 音訊 Placeholder
+                question: "請問這首歌是哪部動漫的片尾曲？", 
+                audio: "https://lochoive-code.github.io/redwhitegames/c3-question-music.mp3", 
                 answerType: "image", 
-                answerText: "灌籃高手", 
+                answerText: "灌籃高手《直到世界的盡頭》", 
                 answerImage: "https://lochoive-code.github.io/redwhitegames/c3-ans-pic.png"
             },
-            // C4: 斯斯感冒膠囊 (Image Question, Video Answer) <-- 已更新為 Video
+            // C4: 斯斯感冒膠囊 (Image Question, Video Answer)
             { 
                 name: "C4", 
                 type: "image", 
@@ -412,14 +419,14 @@
                 image: "https://lochoive-code.github.io/redwhitegames/c4-question-pic.png", 
                 answerType: "video", 
                 answerText: "羅時豐 / 斯斯感冒膠囊廣告", 
-                answerVideo: "https://lochoive-code.github.io/redwhitegames/c4-ans-video.mp4" // 影片答案 Placeholder
+                answerVideo: "https://lochoive-code.github.io/redwhitegames/c4-ans-video.mp4" 
             },
             // C5: 電視劇主題曲 (Audio Question, Image Answer)
             { 
                 name: "C5", 
                 type: "audio", 
                 question: "請問這首歌是哪部電視劇的主題曲？", 
-                audio: "https://lochoive-code.github.io/redwhitegames/c5-quetion-mucis.mp3", // 音訊 Placeholder
+                audio: "https://lochoive-code.github.io/redwhitegames/c5-quetion-mucis.mp3", 
                 answerType: "image", 
                 answerText: "飛龍在天", 
                 answerImage: "https://lochoive-code.github.io/redwhitegames/c5-question-pic.jpeg"
@@ -456,7 +463,7 @@
                 questionImage: 'https://lochoive-code.github.io/redwhitegames/d4-question-pic.png', // 示意圖
                 answer: '參考答案：\n五月天、S.H.E、Energy…等等' 
             },
-            // D5 (選擇題 + 音樂)
+            // D5 (選擇題 + 音樂) - 已修改為重試邏輯
             { 
                 type: 'mcq', 
                 question: '<Let It Be> 是哪個樂團演唱的經典歌曲？', 
@@ -533,14 +540,14 @@
             F0: { 
                 name: "F1 (我幫你選)", 
                 type: "mcq_audio", 
-                question: "世界名曲《天鵝湖》的作曲家是哪一位？", 
+                question: "這段音樂是哪首世界名曲？", 
                 audio: "https://lochoive-code.github.io/redwhitegames/f1-quesiton-music_REV.mp3", 
                 options: [
-                    { text: "A. 巴哈", isCorrect: false },
-                    { text: "B. 蕭邦", isCorrect: false },
-                    { text: "C. 柴可夫斯基", isCorrect: true }
+                    { text: "A. 巴哈 - G大調前奏曲", isCorrect: false },
+                    { text: "B. 蕭邦 - 夜曲", isCorrect: false },
+                    { text: "C. 柴可夫斯基 - 天鵝湖", isCorrect: true }
                 ],
-                answerText: "柴可夫斯基" 
+                answerText: "柴可夫斯基 - 天鵝湖" 
             },
             F1: { 
                 name: "F2 (我幫你選)", 
@@ -819,21 +826,44 @@
                     </div>
                 `;
             }
-            // B: 歌詞填空 (保持手動播放)
+            // B: 歌詞填空 (星星隨機翻牌提醒)
             else if (card.col === 1) {
                 const data = GAP_FILL_ANSWERS[card.row] || {};
+                
+                // 動態生成星星方塊
+                const answerChars = data.answer ? data.answer.split('') : [];
+                const hintGridHtml = `
+                    <div class="flex flex-col items-center mb-6 w-full max-w-3xl">
+                        <p class="text-gray-400 text-sm mb-2 font-bold">(${answerChars.length} 字)</p>
+                        <div id="hint-grid-${card.row}" class="flex flex-wrap justify-center gap-2">
+                            ${answerChars.map((char, index) => `
+                                <div id="hint-char-${card.row}-${index}" 
+                                     class="w-8 h-8 md:w-10 md:h-10 bg-blue-900/50 border border-blue-400 flex items-center justify-center rounded text-yellow-400 font-bold text-lg md:text-xl select-none transition-all duration-300 shadow-md" 
+                                     data-char="${char}">
+                                    ★
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="triggerRandomHint(${card.row})" class="mt-4 px-5 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-full text-sm font-bold shadow-lg transition transform active:scale-95 flex items-center group">
+                            <i data-lucide="sparkles" class="w-4 h-4 mr-2 group-hover:animate-spin"></i> 隨機提示
+                        </button>
+                    </div>
+                `;
+
                 content = `
                     <div class="p-4 md:p-8 flex flex-col items-center text-center relative w-full bg-gray-800 rounded-lg">
                         ${closeBtn}
                         <h3 class="text-xl md:text-3xl font-bold text-blue-400 mb-4">${category.name} - ${label}</h3>
                         
-                        <div class="bg-gray-900 p-4 md:p-6 rounded-xl border-2 border-blue-500/50 mb-6 w-full max-w-3xl shadow-xl">
+                        <div class="bg-gray-900 p-4 md:p-6 rounded-xl border-2 border-blue-500/50 mb-6 w-full max-w-3xl shadow-xl flex flex-col items-center">
                             <p class="text-lg md:text-xl text-yellow-300 mb-3"><i data-lucide="pencil" class="inline w-5 h-5 mr-1"></i> 接出下一句歌詞</p>
-                            <p class="text-xl md:text-4xl font-black text-white leading-relaxed mb-4">${data.question || '資料遺失'}</p>
-                            <p class="text-lg md:text-xl font-bold text-red-400 break-words">${data.hint || ''}</p>
+                            <p class="text-xl md:text-4xl font-black text-white leading-relaxed mb-6">${data.question || '資料遺失'}</p>
+                            
+                            <!-- 新的提示區域：星星與隨機按鈕 -->
+                            ${hintGridHtml}
                             
                             <!-- B 類別音訊：保持手動播放 -->
-                            <div class="mt-4 w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
+                            <div class="w-full bg-blue-950/50 p-3 rounded border border-blue-500/30">
                                 <p class="text-sm text-blue-300 mb-2 flex items-center justify-center">
                                     <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放音訊輔助回想
                                 </p>
@@ -882,14 +912,23 @@
                         </p>
                         <audio id="active-audio" controls src="${data.audio}" class="w-full"></audio>
                     `;
-                } else if (data.type === 'video') {
+                } else if (data.type === 'video' || data.type === 'mcq_video') {
                      // C 類別影片 (C2 修改後)
                      mediaHtml = `
-                        <div class="video-container w-full">
+                        <div class="video-container w-full flex flex-col items-center">
                             <video id="question-video-${label}" controls src="${data.video}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black mb-2"></video>
                             <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
                                 <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放影片
                             </p>
+                             ${data.type === 'mcq_video' ? `
+                                <div class="grid grid-cols-1 gap-3 w-full max-w-sm mt-4">
+                                    ${data.mcq_options.map(opt => `
+                                        <button onclick="checkClassicOption(this, ${opt.isCorrect})" class="w-full p-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-base md:text-lg font-semibold text-white text-center border border-gray-600 transition-all transform active:scale-95 shadow-md">
+                                            ${opt.text}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }
@@ -897,7 +936,7 @@
                 // --- 2. 處理答案媒體 (Video / Image / Audio / Text) ---
                 let answerHtml = '';
                 if(data.answerType === 'video') {
-                    // 影片答案 (C1, C2, C4) - 保持手動播放
+                    // 影片答案 (C1, C4) - 保持手動播放
                     answerHtml = `
                         <p class="text-lg md:text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
                         <div class="video-container w-full">
@@ -940,9 +979,12 @@
                             ${answerHtml}
                         </div>
 
+                        <!-- C2 若為 mcq_video 且有互動選項，則不預設顯示看答案按鈕 (除非是純展示型) -->
+                        ${ (data.type === 'mcq_image' || data.type === 'mcq_video') ? '' : `
                         <button onclick="document.getElementById('answer-box').classList.remove('hidden'); this.classList.add('hidden');" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full shadow-lg transition transform hover:scale-105">
                             <i data-lucide="eye" class="w-5 h-5 inline-block mr-2"></i> 看答案
                         </button>
+                        `}
                     </div>
                 `;
             }
@@ -992,9 +1034,10 @@
                 // --- 互動區域 (按鈕) ---
                 if (data.type === 'mcq') {
                     // 選擇題 (垂直排列選項以容納較長文字)
+                    // 修改：D5 使用 checkFastQaRetry，支援答錯重試
                     interactionAreaContent = `<div class="flex flex-col gap-3 mt-4 w-full max-w-2xl">
                         ${data.options.map((opt, idx) => `
-                            <button onclick="handleFastQaOption(this, ${opt.isCorrect})" class="p-3 md:p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-base md:text-lg font-bold transition text-white border border-purple-500 shadow-md text-left pl-6">
+                            <button onclick="checkFastQaRetry(this, ${opt.isCorrect})" class="p-3 md:p-4 bg-purple-700 hover:bg-purple-600 rounded-lg text-base md:text-lg font-bold transition text-white border border-purple-500 shadow-md text-left pl-6">
                                 ${opt.text}
                             </button>
                         `).join('')}
@@ -1036,11 +1079,14 @@
                         </div>
 
                         <div id="qa-result" class="hidden mt-4 animate-expand w-full flex justify-center">
-                             <div id="qa-success" class="hidden flex flex-col items-center p-4 bg-green-900/80 rounded border border-green-500 w-full max-w-3xl">
-                                <i data-lucide="medal" class="w-16 h-16 md:w-20 md:h-20 text-yellow-400 mb-2"></i>
-                                <span class="text-2xl md:text-3xl font-black text-yellow-400">答對了！</span>
+                             <!-- 修改：將原本的黃色獎牌樣式改為與 C2 相同的綠色 Emoji 樣式，並調整背景透明度為 40% -->
+                             <div id="qa-success" class="hidden flex flex-col items-center p-4 bg-green-900/40 rounded-lg border border-green-500 w-full max-w-3xl animate-expand">
+                                <div class="text-2xl md:text-4xl font-black mb-4 text-green-400 animate-bounce-slow">🎉 答對了！</div>
+                                <p class="text-sm text-green-300 font-bold mb-2">正確答案</p>
+                                ${ data.type === 'mcq' ? `<p class="text-2xl md:text-3xl font-bold text-white mt-2">${data.answer}</p>` : '' }
                              </div>
-                             <!-- 修改：將失敗區塊改為紫色系，作為通用的答案顯示區 -->
+                             
+                             <!-- 失敗區塊 (保持紫色系) -->
                              <div id="qa-fail" class="hidden p-4 bg-purple-900/80 rounded border border-purple-500 w-full max-w-3xl">
                                 <p class="text-purple-200 font-bold mb-2">正確答案</p>
                                 ${answerDisplayHtml}
@@ -1118,6 +1164,33 @@
             return content;
         }
 
+        // --- B 類別新增功能：隨機提示觸發邏輯 ---
+        window.triggerRandomHint = function(rowIndex) {
+            const grid = document.getElementById(`hint-grid-${rowIndex}`);
+            if(!grid) return;
+            
+            // 找出所有內容為 ★ 的方塊 (尚未翻開)
+            const unrevealed = Array.from(grid.children).filter(el => el.innerText.trim() === '★');
+            
+            if (unrevealed.length === 0) {
+                // 全部已翻開，可選提示使用者或不做任何事
+                return;
+            }
+            
+            // 隨機選取一個
+            const randomIndex = Math.floor(Math.random() * unrevealed.length);
+            const target = unrevealed[randomIndex];
+            
+            // 執行翻開動畫與內容更新
+            target.innerText = target.dataset.char;
+            // 移除星星樣式，改為已翻開樣式
+            target.classList.remove('bg-blue-900/50', 'text-yellow-400');
+            target.classList.add('bg-white', 'text-blue-900', 'scale-110'); // 短暫放大
+            
+            // 動畫復原
+            setTimeout(() => target.classList.remove('scale-110'), 200);
+        }
+
         // --- 快問快答 專屬邏輯 (保持不變) ---
         window.startFastQa = function(btn, duration) {
             document.getElementById('qa-start-overlay').classList.add('hidden');
@@ -1149,6 +1222,59 @@
             clearInterval(fastQATimerInterval);
             document.getElementById('qa-interaction-area').classList.add('hidden');
             showFastQaResult(isCorrect);
+        }
+
+        // --- 新增：快問快答重試邏輯 (D5) ---
+        // 與 checkClassicOption 類似，但會停止計時器並顯示在 qa-success 區塊
+        window.checkFastQaRetry = function(btn, isCorrect) {
+            const parent = btn.parentElement;
+            
+            // 清除舊的錯誤提示
+            const existingFeedback = parent.querySelector('#error-feedback'); // 注意：這邊 feedback 可能不是 sibling
+            if(parent.nextElementSibling && parent.nextElementSibling.id === 'error-feedback') {
+                parent.nextElementSibling.remove();
+            }
+
+            if (isCorrect) {
+                // 答對：停止計時，顯示成功
+                clearInterval(fastQATimerInterval);
+                
+                // 標記按鈕
+                btn.classList.add('!bg-green-600', '!border-green-400', 'ring-4', 'ring-green-300', 'scale-105', 'z-10');
+                btn.innerHTML += ' <i data-lucide="check-circle" class="inline w-5 h-5 ml-2"></i>';
+                
+                // 鎖定其他按鈕
+                Array.from(parent.children).forEach(child => {
+                    child.disabled = true;
+                    if (child !== btn) {
+                        child.classList.add('opacity-40', 'cursor-not-allowed', 'blur-[1px]');
+                    }
+                });
+
+                // 顯示結果區塊 (qa-success)
+                document.getElementById('qa-result').classList.remove('hidden');
+                document.getElementById('qa-success').classList.remove('hidden');
+                document.getElementById('qa-success').classList.add('flex');
+                document.getElementById('qa-fail').classList.add('hidden');
+                
+                // 隱藏互動區
+                setTimeout(() => {
+                     document.getElementById('qa-interaction-area').classList.add('hidden');
+                }, 1500); // 稍微延遲讓使用者看到綠色按鈕
+
+            } else {
+                // 答錯：不停止計時，僅顯示錯誤
+                btn.classList.add('!bg-red-600', '!border-red-400', 'opacity-70', 'cursor-not-allowed');
+                btn.disabled = true;
+
+                // 顯示錯誤訊息
+                const feedback = document.createElement('div');
+                feedback.id = "error-feedback";
+                feedback.className = "text-xl font-bold text-red-500 mt-2 bg-black/60 px-4 py-1 rounded-full border border-red-500/50 shadow-lg animate-pulse w-full text-center";
+                feedback.innerHTML = '<i data-lucide="alert-circle" class="inline w-5 h-5 mr-2"></i> 答案不正確，請再試一次';
+                parent.after(feedback);
+            }
+            lucide.createIcons();
         }
 
         window.showFastQaResult = function(isSuccess) {
@@ -1233,7 +1359,7 @@
 
         // --- 頁面渲染函式 ---
         
-        // 1. 修改後首頁：預設隱藏按鈕，Hover 時顯示三個入口
+        // 1. 修改後首頁：預設隱藏按鈕，Hover 時顯示三個入口 --> Modified to Fixed Bottom Menu
         function renderHomePage() {
             setVideoBackground(VIDEO_URLS.HOME);
             gameModal.classList.add('hidden'); 
@@ -1246,38 +1372,30 @@
             // 隱藏 Menu Modal 的 Home 按鈕
             modalCloseHomeBtn.classList.add('hidden');
 
+            // --- 核心修改：移除標題 + 統一按鈕樣式與位置 ---
             appContainer.innerHTML = `
-                <!-- Full-screen interaction zone with Hover trigger -->
-                <div id="home-interaction-zone" 
-                     class="absolute inset-0 z-20 flex flex-col items-center justify-center transition-colors duration-700 bg-black/0 hover:bg-black/50 group cursor-pointer">
+                <!-- Title Removed -->
+                
+                <!-- Fixed Bottom Menu (Lifted Up) -->
+                <!-- 使用 pointer-events-none 讓外層容器不阻擋點擊，內層 pointer-events-auto 恢復按鈕點擊 -->
+                <div class="fixed bottom-32 left-0 w-full z-50 p-4 flex flex-col md:flex-row justify-center items-center gap-6 pointer-events-none">
                     
-                    <!-- 浮現的按鈕群組 -->
-                    <div class="flex flex-col md:flex-row gap-6 md:gap-10 items-center opacity-0 group-hover:opacity-100 transition-all duration-700 transform translate-y-12 group-hover:translate-y-0">
-                        
+                    <div class="flex flex-col md:flex-row gap-6 pointer-events-auto">
                         <!-- 1. 影片回顧 2025 -->
                         <button onclick="renderVideoReviewPage()" 
-                            class="home-hover-btn flex flex-col items-center justify-center w-40 h-40 md:w-56 md:h-56 bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl shadow-2xl border-2 border-purple-400 hover:scale-110 hover:border-white group-hover:delay-100">
-                            <i data-lucide="film" class="w-12 h-12 md:w-16 md:h-16 text-white mb-4"></i>
-                            <span class="text-lg md:text-2xl font-bold text-white">影片回顧 2025</span>
+                            class="flex items-center justify-center space-x-3 px-10 py-5 bg-gray-800/80 hover:bg-purple-600 text-white rounded-full border-4 border-purple-400 shadow-2xl transition transform hover:scale-105 w-full md:w-auto min-w-[320px] backdrop-blur-sm group">
+                            <i data-lucide="film" class="w-8 h-8 group-hover:animate-bounce"></i>
+                            <span class="text-2xl font-black tracking-widest">影片回顧 2025</span>
                         </button>
 
-                        <!-- 2. 選擇遊戲模式 (主要功能) -->
+                        <!-- 2. 選擇遊戲模式 -->
                         <button onclick="renderMenu()" 
-                            class="home-hover-btn flex flex-col items-center justify-center w-48 h-48 md:w-64 md:h-64 bg-gradient-to-br from-red-600 to-orange-600 rounded-full shadow-2xl border-4 border-white animate-pulse-slow hover:animate-none hover:scale-110 group-hover:delay-200">
-                            <i data-lucide="gamepad-2" class="w-16 h-16 md:w-20 md:h-20 text-white mb-4"></i>
-                            <span class="text-xl md:text-3xl font-black text-white">選擇遊戲模式</span>
+                            class="flex items-center justify-center space-x-3 px-10 py-5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white rounded-full border-4 border-white/20 hover:border-white shadow-2xl transition transform hover:scale-105 w-full md:w-auto min-w-[320px] animate-pulse-slow hover:animate-none">
+                            <i data-lucide="gamepad-2" class="w-8 h-8"></i>
+                            <span class="text-2xl font-black tracking-widest">選擇遊戲模式</span>
                         </button>
-
-                        <!-- 3. 抽獎 -->
-                        <button onclick="window.open('https://www.jpcco.com/lang/tw', '_blank')" 
-                            class="home-hover-btn flex flex-col items-center justify-center w-40 h-40 md:w-56 md:h-56 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl shadow-2xl border-2 border-yellow-300 hover:scale-110 hover:border-white group-hover:delay-300">
-                            <i data-lucide="ticket" class="w-12 h-12 md:w-16 md:h-16 text-white mb-4"></i>
-                            <span class="text-lg md:text-2xl font-bold text-white">抽獎</span>
-                        </button>
-
                     </div>
-                    
-                    <p class="absolute bottom-10 text-gray-400/50 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-1000">Hover Screen to Interact</p>
+
                 </div>
             `;
             
@@ -1797,8 +1915,14 @@
             lucide.createIcons();
         }
 
-        // 啟動: 變更為先渲染首頁
-        window.onload = renderHomePage;
+        // 啟動: 變更為先渲染首頁，並設定背景音樂音量
+        window.onload = function() {
+            const bgAudio = document.getElementById('bg-music');
+            if(bgAudio) {
+                bgAudio.volume = 0.5; // 設定音量為 50%
+            }
+            renderHomePage();
+        };
 
     </script>
 </body>
