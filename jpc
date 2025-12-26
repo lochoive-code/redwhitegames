@@ -830,19 +830,38 @@
             else if (card.col === 1) {
                 const data = GAP_FILL_ANSWERS[card.row] || {};
                 
-                // 動態生成星星方塊
+                // 動態生成星星方塊，並處理標點符號
                 const answerChars = data.answer ? data.answer.split('') : [];
+                
+                // 定義標點符號檢查 (包含常見的全形標點)
+                const isPunctuation = (c) => "，,。.！!？?、".includes(c);
+                
+                // 計算有效字數 (不含標點)
+                const validCharCount = answerChars.filter(c => !isPunctuation(c)).length;
+
                 const hintGridHtml = `
                     <div class="flex flex-col items-center mb-6 w-full max-w-3xl">
-                        <p class="text-gray-400 text-sm mb-2 font-bold">(${answerChars.length} 字)</p>
+                        <p class="text-gray-400 text-sm mb-2 font-bold">(${validCharCount} 字)</p>
                         <div id="hint-grid-${card.row}" class="flex flex-wrap justify-center gap-2">
-                            ${answerChars.map((char, index) => `
-                                <div id="hint-char-${card.row}-${index}" 
-                                     class="w-8 h-8 md:w-10 md:h-10 bg-blue-900/50 border border-blue-400 flex items-center justify-center rounded text-yellow-400 font-bold text-lg md:text-xl select-none transition-all duration-300 shadow-md" 
-                                     data-char="${char}">
-                                    ★
-                                </div>
-                            `).join('')}
+                            ${answerChars.map((char, index) => {
+                                if (isPunctuation(char)) {
+                                    // 如果是標點符號，直接顯示文字，不使用星星遮罩
+                                    return `
+                                        <div class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center text-white font-bold text-lg md:text-xl select-none">
+                                            ${char}
+                                        </div>
+                                    `;
+                                } else {
+                                    // 如果是一般文字，顯示星星遮罩
+                                    return `
+                                        <div id="hint-char-${card.row}-${index}" 
+                                             class="w-8 h-8 md:w-10 md:h-10 bg-blue-900/50 border border-blue-400 flex items-center justify-center rounded text-yellow-400 font-bold text-lg md:text-xl select-none transition-all duration-300 shadow-md" 
+                                             data-char="${char}">
+                                            ★
+                                        </div>
+                                    `;
+                                }
+                            }).join('')}
                         </div>
                         <button onclick="triggerRandomHint(${card.row})" class="mt-4 px-5 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-full text-sm font-bold shadow-lg transition transform active:scale-95 flex items-center group">
                             <i data-lucide="sparkles" class="w-4 h-4 mr-2 group-hover:animate-spin"></i> 隨機提示
@@ -1640,14 +1659,85 @@
         }
 
         /**
-         * 處理動作教學卡片的翻轉
+         * 處理動作教學卡片的翻轉與放大顯示
          * @param {number} id - 動作的 ID (100, 101, 102)
          */
         window.flipActionCard = function(id) {
             const cardEl = document.getElementById(`action-card-${id}`);
             if (cardEl) {
-                cardEl.classList.toggle('is-flipped');
+                 // 1. 翻轉卡片 (視覺上標記為已選/已翻開) - 保持翻轉狀態，因為背景還是看得到
+                if(!cardEl.classList.contains('is-flipped')) {
+                    cardEl.classList.add('is-flipped');
+                }
             }
+            
+            // 2. 取得資料
+            const action = PUNCH_KING_ACTIONS.find(a => a.id === id);
+            if(!action) return;
+
+            // 3. 顯示放大 Modal
+            openActionModal(action);
+        }
+
+        function openActionModal(action) {
+            // 根據陣營設定 Modal 邊框與文字顏色
+            let borderClass = 'border-yellow-400';
+            let textClass = 'text-yellow-400';
+            
+            if(action.color === 'red') {
+                borderClass = 'border-red-500';
+                textClass = 'text-red-500';
+            } else if (action.color === 'white') {
+                borderClass = 'border-gray-300';
+                textClass = 'text-white';
+            }
+
+            // 重置並設定 Modal 樣式 (比題目卡片更大，適合展示圖片)
+            // 移除舊有的寬度限制，加入新的寬度設定
+            modalWrapper.className = `bg-gray-900 text-white rounded-xl shadow-2xl w-full border-4 p-4 transform scale-95 opacity-0 transition-all duration-300 relative flex flex-col max-h-[95vh] ${borderClass} max-w-5xl`; // max-w-5xl for larger image
+
+            // 隱藏 Menu Modal 的 Home 按鈕
+            modalCloseHomeBtn.classList.add('hidden');
+
+            const content = `
+                <div class="relative w-full h-full flex flex-col items-center justify-center">
+                    <!-- 關閉按鈕 -->
+                    <button onclick="closeContentModal()" class="absolute top-0 right-0 md:-top-2 md:-right-2 text-gray-400 hover:text-white transition z-50 bg-black/50 rounded-full p-1">
+                        <i data-lucide="x-circle" class="w-10 h-10"></i>
+                    </button>
+
+                    <div class="flex items-center justify-center space-x-4 mb-4">
+                        <span class="text-6xl md:text-7xl animate-bounce-slow">${action.emoji}</span>
+                        <h3 class="text-4xl md:text-6xl font-black ${textClass} tracking-widest">
+                            ${action.name}
+                        </h3>
+                    </div>
+                    
+                    <div class="w-full flex-1 flex items-center justify-center mb-6 overflow-hidden min-h-0">
+                        <img src="${action.actionImage}" 
+                             class="max-h-[60vh] w-auto object-contain rounded-xl border-4 ${borderClass} shadow-2xl" 
+                             alt="${action.name} 動作示範"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x600/4B5563/ffffff?text=圖片載入失敗'">
+                    </div>
+
+                    <div class="bg-gray-800/80 p-4 rounded-xl border border-gray-600 w-full text-center">
+                        <p class="text-xl md:text-3xl text-white font-bold leading-relaxed">
+                            ${action.instruction}
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            modalContent.innerHTML = content;
+            gameModal.classList.remove('hidden');
+            
+            // 動畫
+            setTimeout(() => {
+                modalWrapper.classList.remove('scale-95', 'opacity-0');
+                modalWrapper.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            lucide.createIcons();
         }
 
         /**
