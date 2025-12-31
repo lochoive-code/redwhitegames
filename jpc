@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>紅白PLAY翻天</title>
+    
+    <!-- 預先連線至資源伺服器以加速載入 -->
+    <link rel="preconnect" href="https://lochoive-code.github.io" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+
     <!-- 載入 Inter 字體 -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <!-- 載入 Tailwind CSS CDN -->
@@ -229,14 +235,13 @@
 </head>
 <body>
 
-    <!-- 全螢幕背景影片 -->
-    <video autoplay loop muted playsinline id="video-background">
+    <!-- 全螢幕背景影片 (背景使用 preload="auto" 確保主要視覺載入) -->
+    <video autoplay loop muted playsinline preload="auto" id="video-background">
         <source src="https://lochoive-code.github.io/video/redwhite-game.mp4" type="video/mp4" onerror="this.onerror=null; this.src='https://lochoive-code.github.io/video/redwhite-game.mp4'">
     </video>
     
-    <!-- 背景音樂 (請將 src 替換為您的音樂檔案連結) -->
-    <!-- 這裡預設使用一個免費的範例音樂作為測試 -->
-    <audio id="bg-music" loop>
+    <!-- 背景音樂 -->
+    <audio id="bg-music" loop preload="auto">
         <source src="https://lochoive-code.github.io/redwhitegames/bgm.mp3" type="audio/mp3">
     </audio>
 
@@ -886,7 +891,7 @@
                                 <p class="text-sm text-blue-300 mb-2 flex items-center justify-center">
                                     <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放音訊輔助回想
                                 </p>
-                                <audio id="question-audio-${label}" controls src="${data.audio}" class="w-full"></audio>
+                                <audio id="question-audio-${label}" controls src="${data.audio}" class="w-full" preload="metadata"></audio>
                             </div>
                             <!-- 結束 B 類別音訊 -->
                         </div>
@@ -911,7 +916,7 @@
                 if(data.type === 'image' || data.type === 'mcq_image') {
                     mediaHtml = `
                         <div class="flex flex-col items-center w-full">
-                            <img src="${data.image}" class="max-h-48 md:max-h-64 rounded-lg border border-green-500 mx-auto mb-4 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">
+                            <img src="${data.image}" loading="lazy" decoding="async" class="max-h-48 md:max-h-64 rounded-lg border border-green-500 mx-auto mb-4 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗'">
                             ${data.type === 'mcq_image' ? `
                                 <div class="grid grid-cols-1 gap-3 w-full max-w-sm mt-4">
                                     ${data.mcq_options.map(opt => `
@@ -929,13 +934,13 @@
                         <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
                             <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放聲音
                         </p>
-                        <audio id="active-audio" controls src="${data.audio}" class="w-full"></audio>
+                        <audio id="active-audio" controls src="${data.audio}" class="w-full" preload="metadata"></audio>
                     `;
                 } else if (data.type === 'video' || data.type === 'mcq_video') {
                      // C 類別影片 (C2 修改後)
                      mediaHtml = `
                         <div class="video-container w-full flex flex-col items-center">
-                            <video id="question-video-${label}" controls src="${data.video}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black mb-2"></video>
+                            <video id="question-video-${label}" controls src="${data.video}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black mb-2" preload="metadata"></video>
                             <p class="text-sm text-yellow-500 mb-2 flex items-center justify-center">
                                 <i data-lucide="play" class="w-4 h-4 mr-1"></i> 請點擊播放影片
                             </p>
@@ -959,7 +964,7 @@
                     answerHtml = `
                         <p class="text-lg md:text-xl font-bold text-white mb-3">${data.answerText || '影片答案'}</p>
                         <div class="video-container w-full">
-                            <video id="ans-video" controls src="${data.answerVideo}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black"></video>
+                            <video id="ans-video" controls src="${data.answerVideo}" class="w-full rounded-lg max-h-60 md:max-h-80 bg-black" preload="metadata"></video>
                         </div>
                         <p class="text-sm text-green-300 mt-2">請點擊播放觀看答案影片</p>
                     `;
@@ -967,7 +972,7 @@
                     // 圖片答案 (C3, C5)
                     answerHtml = `
                         <p class="text-xl md:text-2xl font-bold text-white mb-3">${data.answerText || '圖片答案'}</p>
-                        <img src="${data.answerImage}" class="max-h-48 md:max-h-64 rounded-lg border-4 border-green-500 shadow-xl mx-auto w-auto" 
+                        <img src="${data.answerImage}" loading="lazy" decoding="async" class="max-h-48 md:max-h-64 rounded-lg border-4 border-green-500 shadow-xl mx-auto w-auto" 
                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/10B981/ffffff?text=圖片載入失敗';" 
                             alt="答案圖片">
                     `;
@@ -976,7 +981,7 @@
                     answerHtml = `
                         <p class="text-xl md:text-2xl font-bold text-white mb-3">歌手：${data.answerText || '音樂答案'}</p>
                         <p class="text-sm text-yellow-500 mb-2">請點擊播放音檔</p>
-                        <audio id="ans-audio" controls src="${data.answerAudio}" class="w-full"></audio>
+                        <audio id="ans-audio" controls src="${data.answerAudio}" class="w-full" preload="metadata"></audio>
                     `;
                 } else {
                     // 純文字答案 (Fallback)
@@ -1021,7 +1026,7 @@
                 if (data.questionImage) {
                     // 修改：放大題目圖片高度 (max-h-52 md:max-h-80) 以解決圖片過小的問題
                     questionMediaHtml += `
-                        <img src="${data.questionImage}" class="max-h-52 md:max-h-80 rounded-lg border border-purple-500 mx-auto mt-4 mb-2 shadow-lg w-auto" 
+                        <img src="${data.questionImage}" loading="lazy" decoding="async" class="max-h-52 md:max-h-80 rounded-lg border border-purple-500 mx-auto mt-4 mb-2 shadow-lg w-auto" 
                              onerror="this.onerror=null; this.src='https://placehold.co/600x400/4B5563/ffffff?text=圖片載入失敗';">
                     `;
                 }
@@ -1029,7 +1034,7 @@
                     // 移除 autoplay，並加上特定 ID 供 JS 呼叫
                     questionMediaHtml += `
                         <div class="mt-4 w-full bg-purple-950/50 p-3 rounded border border-purple-500/30">
-                            <audio id="fast-qa-audio" controls src="${data.audio}" class="w-full mb-2"></audio>
+                            <audio id="fast-qa-audio" controls src="${data.audio}" class="w-full mb-2" preload="metadata"></audio>
                             <p class="text-xs text-yellow-500">🔊 按下「開始計時」後自動播放</p>
                         </div>
                     `;
@@ -1041,7 +1046,7 @@
                     answerDisplayHtml = `
                         <div class="flex flex-col items-center p-4">
                             <p class="text-xl md:text-2xl font-bold text-white mb-3">${data.answer}</p>
-                            <img src="${data.answerImage}" class="max-h-60 md:max-h-96 rounded-lg border-4 border-purple-500 shadow-xl w-auto" 
+                            <img src="${data.answerImage}" loading="lazy" decoding="async" class="max-h-60 md:max-h-96 rounded-lg border-4 border-purple-500 shadow-xl w-auto" 
                                 onerror="this.onerror=null; this.src='https://placehold.co/600x400/4B5563/ffffff?text=圖片載入失敗';" 
                                 alt="答案圖片">
                         </div>
@@ -1131,7 +1136,7 @@
                             <p class="text-sm text-${color}-300 mb-2 flex items-center justify-center">
                                 <i data-lucide="music" class="w-4 h-4 mr-1"></i> 點擊播放音訊
                             </p>
-                            <audio id="active-audio" controls src="${data.audio}" class="w-full"></audio>
+                            <audio id="active-audio" controls src="${data.audio}" class="w-full" preload="metadata"></audio>
                         </div>
                     `;
                 }
@@ -1151,7 +1156,7 @@
                 // 檢查是否有答案圖片
                 let answerMediaHtml = '';
                 if (data.answerImage) {
-                    answerMediaHtml = `<img src="${data.answerImage}" class="max-h-48 md:max-h-64 rounded-lg border-2 border-${color}-400 mt-4 mx-auto shadow-lg w-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/${isF ? 'F59E0B' : '6366F1'}/ffffff?text=圖片載入失敗'">`;
+                    answerMediaHtml = `<img src="${data.answerImage}" loading="lazy" decoding="async" class="max-h-48 md:max-h-64 rounded-lg border-2 border-${color}-400 mt-4 mx-auto shadow-lg w-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/${isF ? 'F59E0B' : '6366F1'}/ffffff?text=圖片載入失敗'">`;
                 }
 
                 content = `
@@ -1448,7 +1453,7 @@
 
                     <!-- 影片播放器容器 -->
                     <div class="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-700 relative group">
-                        <video autoplay controls class="w-full h-full object-contain">
+                        <video autoplay controls class="w-full h-full object-contain" preload="metadata">
                             <source src="${VIDEO_URLS.REVIEW}" type="video/mp4">
                             您的瀏覽器不支援影片播放。
                         </video>
@@ -1714,7 +1719,7 @@
                     </div>
                     
                     <div class="w-full flex-1 flex items-center justify-center mb-6 overflow-hidden min-h-0">
-                        <img src="${action.actionImage}" 
+                        <img src="${action.actionImage}" loading="lazy" decoding="async"
                              class="max-h-[60vh] w-auto object-contain rounded-xl border-4 ${borderClass} shadow-2xl" 
                              alt="${action.name} 動作示範"
                              onerror="this.onerror=null; this.src='https://placehold.co/400x600/4B5563/ffffff?text=圖片載入失敗'">
@@ -1774,7 +1779,7 @@
                         <!-- Back Face: Image and Instruction (已優化為直式佈局) -->
                         <div class="card-face card-back bg-gray-900/90 p-4 border-4 ${border} overflow-hidden">
                             <div class="flex flex-col items-center justify-start w-full h-full text-center py-2">
-                                <img src="${action.actionImage}" 
+                                <img src="${action.actionImage}" loading="lazy" decoding="async"
                                      class="w-full h-auto max-h-48 md:max-h-64 object-contain rounded-lg border-2 ${border} mb-4 shadow-lg" 
                                      alt="動作示範圖: ${action.name}"
                                      onerror="this.onerror=null; this.src='https://placehold.co/200x300/4B5563/ffffff?text=直式圖片載入失敗'">
