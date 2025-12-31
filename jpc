@@ -1394,7 +1394,8 @@
             
             // 確保影片初始清晰，遮罩初始透明
             document.getElementById('video-background').classList.remove('video-dimmed');
-            dimmingOverlay.classList.remove('opacity-60');
+            // 修改：確保移除所有可能的遮罩樣式 (包含遊戲的 60% 和回顧影片的 80%)
+            dimmingOverlay.classList.remove('opacity-60', 'opacity-80');
             dimmingOverlay.classList.add('opacity-0');
             
             // 隱藏 Menu Modal 的 Home 按鈕
