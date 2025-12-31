@@ -300,16 +300,16 @@
         // 流程說明步驟 (白色球：紅白大歌星)
         const WHITE_BALL_STEPS = [
             { title: "派代表上台", description: "各桌推派 1 位代表上台參加遊戲。", icon: "user-plus" },
-            { title: "搶答進行", description: "每題由紅白隊各派 1 人搶答，答對者留在台上。", icon: "message-square" },
+            { title: "搶答進行", description: "每題由紅白隊各派 1 人搶答，每人限搶答一次, 不得重複答題。", icon: "message-square" },
             { title: "答題獎勵", description: "答對者可獲扭蛋獎。", icon: "gift" },
-            { title: "判定勝負", description: "遊戲結束時，留在台上的紅白隊人數多寡決定勝利隊伍。", icon: "trophy" },
+            { title: "判定勝負", description: "遊戲結束時，答對題目數較多的隊伍獲勝。", icon: "trophy" },
             { title: "抽取幸運兒", description: "勝利隊伍從專屬獎池抽出 1 位幸運兒獲得遊戲獎金；若平手，兩隊各有一次抽獎機會。", icon: "star" }
         ];
         
         // 流程說明步驟 (紅色球：紅白拳王爭霸戰 - 新增)
         const RED_BALL_STEPS = [
-            { title: "全員起立", description: "全體起立，準備與舞台前方的總經理或董事長進行猜拳。", icon: "users" },
-            { title: "猜拳對決", description: "與舞台對手進行猜拳。\n猜輸者：可坐下，享用美食。\n猜贏者：繼續下一輪挑戰。", icon: "hand-metal" },
+            { title: "全員起立", description: "全體起立，準備與舞台前方的董事長或總經理進行猜拳。", icon: "users" },
+            { title: "猜拳對決", description: "與台上長官進行猜拳。\n猜輸者：可坐下，享用美食。\n猜贏者：繼續下一輪挑戰。", icon: "hand-metal" },
             { title: "剩餘挑戰者", description: "遊戲進行至剩下最後 10 人。\n每位剩下的參加者可獲得 扭蛋獎。", icon: "gift" },
             { title: "判定勝隊", description: "根據最後 10 人中紅白隊人數多寡，判定 獲勝隊伍。", icon: "trophy" },
             { title: "抽獎贈獎", description: "獲勝隊伍可從專屬獎池抽出一位幸運兒，獲得 遊戲獎金。\n若兩隊平手，則兩隊各有一次抽獎機會。", icon: "star" }
@@ -349,6 +349,10 @@
         let cardData = [];
         let currentWhiteStep = 0; // 追蹤紅白大歌星 (White Ball) 步驟
         let currentRedStep = 0;   // 追蹤紅白拳王爭霸戰 (Red Ball) 步驟
+        // 新增：追蹤選單卡片翻轉狀態
+        let isRedMenuCardFlipped = false;
+        let isWhiteMenuCardFlipped = false;
+
         const appContainer = document.getElementById('app-container');
         const gameModal = document.getElementById('game-modal');
         const modalContent = document.getElementById('modal-content');
@@ -1396,6 +1400,9 @@
             // 隱藏 Menu Modal 的 Home 按鈕
             modalCloseHomeBtn.classList.add('hidden');
 
+            // --- 新增：回到首頁時，自動播放背景音樂 ---
+            tryPlayBackgroundMusic();
+
             // --- 核心修改：移除標題 + 統一按鈕樣式與位置 ---
             appContainer.innerHTML = `
                 <!-- Title Removed -->
@@ -1453,7 +1460,8 @@
 
                     <!-- 影片播放器容器 -->
                     <div class="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-gray-700 relative group">
-                        <video autoplay controls class="w-full h-full object-contain" preload="metadata">
+                        <!-- 新增 onended 事件：影片播放完畢後自動返回首頁 -->
+                        <video autoplay controls class="w-full h-full object-contain" preload="metadata" onended="renderHomePage()">
                             <source src="${VIDEO_URLS.REVIEW}" type="video/mp4">
                             您的瀏覽器不支援影片播放。
                         </video>
@@ -1465,7 +1473,7 @@
             lucide.createIcons();
         }
         
-        // 新增處理選單卡片點擊的函式 (翻牌與導航邏輯)
+        // 修改處理選單卡片點擊的函式 (翻牌與導航邏輯 - 增加狀態保存)
         window.handleMenuCardClick = function(el, type) {
             if (el.classList.contains('is-flipped')) {
                 // 已經翻開了 -> 執行導航
@@ -1475,8 +1483,10 @@
                     navigateTo(() => renderWhiteBallTutorialSteps(0));
                 }
             } else {
-                // 尚未翻開 -> 執行翻牌 (單向，不可逆)
+                // 尚未翻開 -> 執行翻牌 (單向，不可逆)並記錄狀態
                 el.classList.add('is-flipped');
+                if (type === 'red') isRedMenuCardFlipped = true;
+                if (type === 'white') isWhiteMenuCardFlipped = true;
             }
         }
 
@@ -1505,13 +1515,17 @@
                 modalWrapper.classList.add('scale-100', 'opacity-100');
             }, 10);
             
+            // 根據全域狀態決定是否加上 is-flipped class
+            const redCardClass = isRedMenuCardFlipped ? "card-container h-40 md:h-48 w-full is-flipped" : "card-container h-40 md:h-48 w-full";
+            const whiteCardClass = isWhiteMenuCardFlipped ? "card-container h-40 md:h-48 w-full is-flipped" : "card-container h-40 md:h-48 w-full";
+
             modalContent.innerHTML = `
                 <div class="space-y-4 p-4 md:p-6 pt-10">
                     <h3 class="text-3xl md:text-4xl font-bold text-center text-white text-shadow mb-6">選擇遊戲模式</h3>
                     
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Red Ball Game Card -->
-                        <div class="card-container h-40 md:h-48 w-full" onclick="handleMenuCardClick(this, 'red')">
+                        <div class="${redCardClass}" onclick="handleMenuCardClick(this, 'red')">
                             <!-- Front (Mystery) -->
                             <div class="card-face card-front bg-gray-800 border-4 border-gray-600 shadow-xl flex flex-col items-center justify-center group hover:border-gray-400 transition-colors">
                                 <span class="text-5xl md:text-6xl animate-pulse text-gray-500">?</span>
@@ -1528,7 +1542,7 @@
                         </div>
 
                         <!-- White Ball Game Card -->
-                        <div class="card-container h-40 md:h-48 w-full" onclick="handleMenuCardClick(this, 'white')">
+                        <div class="${whiteCardClass}" onclick="handleMenuCardClick(this, 'white')">
                              <!-- Front (Mystery) -->
                             <div class="card-face card-front bg-gray-800 border-4 border-gray-600 shadow-xl flex flex-col items-center justify-center group hover:border-gray-400 transition-colors">
                                 <span class="text-5xl md:text-6xl animate-pulse text-gray-500">?</span>
@@ -1820,7 +1834,10 @@
                         <button onclick="navigateTo(() => renderRedBallTutorialSteps(${RED_BALL_STEPS.length - 1}))" class="px-6 py-3 bg-gray-700/50 hover:bg-gray-700 text-white rounded-full text-lg border border-gray-600 transition transform hover:scale-105">
                             <i data-lucide="arrow-left" class="w-5 h-5 inline-block mr-2"></i> 返回流程說明
                         </button>
-                        <!-- 移除多餘的返回選單按鈕 -->
+                        <!-- 新增：直接返回遊戲選單按鈕 -->
+                        <button onclick="navigateTo(renderMenu)" class="px-6 py-3 bg-gray-700/50 hover:bg-gray-700 text-white rounded-full text-lg border border-gray-600 transition transform hover:scale-105">
+                            <i data-lucide="layout-grid" class="w-5 h-5 inline-block mr-2"></i> 返回遊戲選單
+                        </button>
                     </div>
                 </div>
             `;
