@@ -277,6 +277,26 @@
         </div>
     </div>
 
+    <!-- 新增：重新開始確認 Modal (取代被封鎖的 confirm 視窗) -->
+    <div id="reset-confirm-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-gray-900 text-white rounded-xl shadow-2xl w-full max-w-sm border-2 border-red-500 p-6 transform scale-100 relative flex flex-col items-center text-center animate-bounce-slow">
+            <div class="mb-4 text-red-500 bg-red-900/30 p-4 rounded-full">
+                <i data-lucide="alert-triangle" class="w-10 h-10 mx-auto"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2 text-white">確定要重新開始？</h3>
+            <p class="text-gray-400 mb-6 text-sm">這將會清除所有的<br>翻牌進度與步驟紀錄且無法復原！</p>
+            
+            <div class="flex space-x-3 w-full">
+                <button onclick="closeResetModal()" class="flex-1 py-3 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white rounded-lg font-bold transition">
+                    取消
+                </button>
+                <button onclick="confirmResetGame()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold transition shadow-lg shadow-red-900/50">
+                    確認清除
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- 資料設定 ---
         const VIDEO_URLS = {
@@ -300,7 +320,7 @@
         // 流程說明步驟 (白色球：紅白大歌星)
         const WHITE_BALL_STEPS = [
             { title: "派代表上台", description: "各桌推派 1 位代表上台參加遊戲。", icon: "user-plus" },
-            { title: "搶答進行", description: "每題由紅白隊各派 1 人搶答，每人限搶答一次, 不得重複答題。", icon: "message-square" },
+            { title: "搶答進行", description: "每題由紅白隊各派 1 人搶答，每人限搶答一次，不得重複答題。", icon: "message-square" },
             { title: "答題獎勵", description: "答對者可獲扭蛋獎。", icon: "gift" },
             { title: "判定勝負", description: "遊戲結束時，答對題目數較多的隊伍獲勝。", icon: "trophy" },
             { title: "抽取幸運兒", description: "勝利隊伍從專屬獎池抽出 1 位幸運兒獲得遊戲獎金；若平手，兩隊各有一次抽獎機會。", icon: "star" }
@@ -597,6 +617,63 @@
                 answerText: "B：冰雪奇緣 Frozen" 
             }
         };
+        
+        // --- 本地儲存功能 (LocalStorage) ---
+        const STORAGE_KEY = 'RED_WHITE_GAME_STATE';
+
+        function saveGameState() {
+            const state = {
+                cardData,
+                isRedMenuCardFlipped,
+                isWhiteMenuCardFlipped,
+                currentRedStep,
+                currentWhiteStep
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    // 恢復變數
+                    if(state.cardData) cardData = state.cardData;
+                    if(state.isRedMenuCardFlipped !== undefined) isRedMenuCardFlipped = state.isRedMenuCardFlipped;
+                    if(state.isWhiteMenuCardFlipped !== undefined) isWhiteMenuCardFlipped = state.isWhiteMenuCardFlipped;
+                    if(state.currentRedStep !== undefined) currentRedStep = state.currentRedStep;
+                    if(state.currentWhiteStep !== undefined) currentWhiteStep = state.currentWhiteStep;
+                    return true;
+                } catch (e) {
+                    console.error("Load Game State Failed", e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // 修改：使用自定義 Modal 取代 browser confirm()，解決被封鎖的問題
+        window.resetGame = function() {
+            const modal = document.getElementById('reset-confirm-modal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                // 確保圖示被渲染
+                lucide.createIcons();
+            }
+        }
+
+        // 新增：關閉重置確認 Modal
+        window.closeResetModal = function() {
+            const modal = document.getElementById('reset-confirm-modal');
+            if(modal) modal.classList.add('hidden');
+        }
+
+        // 新增：執行重置
+        window.confirmResetGame = function() {
+            localStorage.removeItem(STORAGE_KEY);
+            // 重新載入頁面
+            window.location.reload();
+        }
 
         // --- 輔助函式 ---
         function setVideoBackground(url) {
@@ -709,6 +786,8 @@
                 if (cardEl) {
                     cardEl.classList.add('is-flipped');
                     card.isFlipped = true;
+                    // 保存進度
+                    saveGameState();
                 }
             }
 
@@ -1408,6 +1487,12 @@
             appContainer.innerHTML = `
                 <!-- Title Removed -->
                 
+                <!-- Reset Data Button (Top Right) -->
+                <button onclick="resetGame()" class="absolute top-4 right-4 z-50 px-3 py-2 bg-red-900/60 hover:bg-red-700 text-red-200 rounded-lg text-sm border border-red-800 shadow-lg transition flex items-center space-x-2 backdrop-blur-sm">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    <span>重新開始遊戲</span>
+                </button>
+                
                 <!-- Fixed Bottom Menu (Lifted Up) -->
                 <!-- 使用 pointer-events-none 讓外層容器不阻擋點擊，內層 pointer-events-auto 恢復按鈕點擊 -->
                 <div class="fixed bottom-32 left-0 w-full z-50 p-4 flex flex-col md:flex-row justify-center items-center gap-6 pointer-events-none">
@@ -1488,6 +1573,8 @@
                 el.classList.add('is-flipped');
                 if (type === 'red') isRedMenuCardFlipped = true;
                 if (type === 'white') isWhiteMenuCardFlipped = true;
+                // 保存進度
+                saveGameState();
             }
         }
 
@@ -1594,6 +1681,8 @@
             const newStep = currentRedStep + direction;
             if (newStep >= 0 && newStep < RED_BALL_STEPS.length) {
                 renderRedBallTutorialSteps(newStep);
+                // 保存進度
+                saveGameState();
             } else if (newStep >= RED_BALL_STEPS.length) {
                  // 最後一步按「下一步」則導向動作教學板
                 navigateTo(renderRedBallActionTutorial); 
@@ -1854,6 +1943,8 @@
             const newStep = currentWhiteStep + direction;
             if (newStep >= 0 && newStep < WHITE_BALL_STEPS.length) {
                 renderWhiteBallTutorialSteps(newStep);
+                // 保存進度
+                saveGameState();
             } else if (newStep >= WHITE_BALL_STEPS.length) {
                 // 最後一步按「下一步」則導向主板
                 navigateTo(renderWhiteBallBoard);
@@ -1948,17 +2039,18 @@
             dimmingOverlay.classList.remove('opacity-0');
             dimmingOverlay.classList.add('opacity-60');
 
-            // 生成卡片資料
-            cardData = [];
-            let idCounter = 1;
-            for (let col = 0; col < CATEGORY_COLORS.length; col++) {
-                for (let row = 0; row < ROW_COUNT; row++) {
-                    cardData.push({ 
-                        id: idCounter++, 
-                        col, 
-                        row, 
-                        isFlipped: false 
-                    });
+            // --- 修改：僅在 cardData 為空時初始化，若已有資料(已載入)則不重置 ---
+            if (cardData.length === 0) {
+                let idCounter = 1;
+                for (let col = 0; col < CATEGORY_COLORS.length; col++) {
+                    for (let row = 0; row < ROW_COUNT; row++) {
+                        cardData.push({ 
+                            id: idCounter++, 
+                            col, 
+                            row, 
+                            isFlipped: false 
+                        });
+                    }
                 }
             }
             
@@ -1980,10 +2072,13 @@
                     const card = cardData.find(c => c.col === col && c.row === row);
                     const cat = CATEGORY_COLORS[col];
                     const label = `${CATEGORY_LETTERS[col]}${row + 1}`;
+                    
+                    // 新增：根據 isFlipped 狀態加上 class
+                    const flippedClass = card.isFlipped ? 'is-flipped' : '';
 
                     // Grid Item: 佔用 1 欄位
                     gridHtml += `
-                        <div id="card-${card.id}" class="card-container" onclick="flipCard(${card.id})">
+                        <div id="card-${card.id}" class="card-container ${flippedClass}" onclick="flipCard(${card.id})">
                             <div class="card-face card-front ${cat.bg} ${cat.text} hover:${cat.hover} transition duration-300">
                                 <span class="text-xl md:text-3xl font-black drop-shadow-md">${label}</span>
                             </div>
@@ -2030,6 +2125,12 @@
 
         // 啟動: 變更為先渲染首頁，並設定背景音樂音量
         window.onload = function() {
+            // 嘗試載入遊戲進度
+            const hasSavedData = loadGameState();
+            if (hasSavedData) {
+                console.log("已恢復遊戲進度");
+            }
+
             const bgAudio = document.getElementById('bg-music');
             if(bgAudio) {
                 bgAudio.volume = 0.5; // 設定音量為 50%
