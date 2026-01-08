@@ -470,15 +470,15 @@
 
     </div>
 
-    <!-- 圖片放大遮罩 -->
+   <!-- 圖片放大遮罩 (精化版) -->
     <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
-        <span class="close-btn">&times;</span>
-        <img id="zoomImage" src="">
+        <div class="close-btn">✕</div>
+        <img id="zoomImage" src="" onclick="event.stopPropagation()">
     </div>
 
     <script>
         let currentPage = 0;
-        const totalPages = 9; // 總共有 9 頁
+        const totalPages = 9;
         const wrapper = document.getElementById('mainWrapper');
         const dots = document.querySelectorAll('.dot');
         const nextBtn = document.getElementById('nextBtn');
@@ -487,20 +487,12 @@
             if (index < 0 || index >= totalPages) return;
             currentPage = index;
             wrapper.style.transform = `translateX(-${currentPage * 100}vw)`;
-            
-            // 更新導覽點
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPage));
-            
-            // 最後一頁隱藏「下一頁」按鈕
-            nextBtn.style.opacity = (currentPage === totalPages - 1) ? '0' : '1';
-            nextBtn.style.pointerEvents = (currentPage === totalPages - 1) ? 'none' : 'auto';
+            nextBtn.style.display = (currentPage === totalPages - 1) ? 'none' : 'flex';
         }
 
-        function nextPage() {
-            if (currentPage < totalPages - 1) scrollToPage(currentPage + 1);
-        }
+        function nextPage() { scrollToPage(currentPage + 1); }
 
-        // 觸控滑動支援
         let touchStartX = 0;
         window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
         window.addEventListener('touchend', e => {
@@ -511,7 +503,6 @@
             }
         });
 
-        // 圖片放大功能
         function openModal(src) {
             const overlay = document.getElementById('zoomOverlay');
             const img = document.getElementById('zoomImage');
@@ -525,6 +516,12 @@
             overlay.classList.remove('show');
             setTimeout(() => overlay.style.display = 'none', 300);
         }
+
+        // 點擊點跳轉
+        dots.forEach((dot, i) => {
+            dot.onclick = () => scrollToPage(i);
+        });
     </script>
 </body>
+</html>
 </html>
