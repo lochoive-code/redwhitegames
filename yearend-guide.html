@@ -76,12 +76,38 @@
             padding: 8px;
             margin-bottom: 1.25rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
             position: relative;
             cursor: zoom-in;
+            overflow: hidden;
         }
+        
+        /* 針對名單卡片特別放大處理 */
+        .seat-card.list-card {
+            padding: 12px;
+            background: #fffafa;
+            border: 1px dashed var(--primary-red);
+        }
+
+        /* 電腦版 Hover 放大效果 */
+        @media (min-width: 1024px) {
+            .seat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+                border-color: var(--primary-red);
+            }
+            .seat-card:hover img {
+                transform: scale(1.08); /* 稍微增加放大比例 */
+            }
+        }
+        
         .seat-card:active { transform: scale(0.98); }
-        .seat-card img { width: 100%; border-radius: 12px; display: block; }
+        .seat-card img { 
+            width: 100%; 
+            border-radius: 12px; 
+            display: block; 
+            transition: transform 0.5s ease;
+        }
         
         .zoom-badge {
             position: absolute;
@@ -97,6 +123,7 @@
             align-items: center;
             gap: 4px;
             backdrop-filter: blur(4px);
+            z-index: 2;
         }
 
         .schedule-container {
@@ -166,17 +193,49 @@
             align-items: center;
             opacity: 0;
             transition: opacity 0.3s ease;
+            overflow-y: auto; /* 允許垂直滾動查看長圖 */
         }
         .zoom-overlay.show { opacity: 1; display: flex; }
-        .zoom-overlay img { max-width: 95%; max-height: 90%; object-fit: contain; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        /* 放大後的圖片容器，確保長圖可以滾動 */
+        .zoom-img-container {
+            max-width: 95%;
+            max-height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 名單長圖建議從頂部開始看 */
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .zoom-overlay img { 
+            max-width: 100%; 
+            height: auto; 
+            object-fit: contain; 
+            transform: scale(0.9); 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border-radius: 4px;
+        }
         .zoom-overlay.show img { transform: scale(1); }
-        .close-btn { position: absolute; top: 25px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .close-btn { position: fixed; top: 25px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 1001; }
 
         .section-title { color: var(--primary-red); font-weight: 900; font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
         .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.25rem; background-color: var(--primary-red); margin-right: 0.5rem; border-radius: 2px; }
         
         .quiz-card { background: var(--light-red); border-left: 5px solid var(--primary-red); padding: 1rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
         .highlight-red { color: var(--primary-red); font-weight: bold; }
+
+        /* 穿搭卡片樣式 */
+        .dress-code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .dress-card { border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; }
+        .dress-img-container { width: 100%; aspect-ratio: 1; border-radius: 8px; margin-bottom: 8px; overflow: hidden; cursor: pointer; }
+        .dress-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .dress-img-container:hover img { transform: scale(1.1); }
+
+        .info-row { display: flex; margin-bottom: 8px; }
+        .info-label { width: 60px; font-weight: 900; color: var(--primary-red); flex-shrink: 0; }
+        .info-value { color: #444; }
     </style>
 </head>
 <body>
@@ -216,7 +275,7 @@
                     <img src="https://lochoive-code.github.io/redwhitegames/S_gainfriends_2dbarcodes_BW.png" alt="QR Code" class="w-full h-full object-contain">
                 </div>
                 
-                <p class="text-xs text-gray-400 mt-6">僅限內部員工活動使用<br>
+                <p class="text-xs text-gray-400 mt-6">僅限內部員工活動使用</p>
                 <div class="mt-8">
                     <button onclick="nextPage()" class="bg-red-600 text-white font-bold py-2 px-8 rounded-full text-sm shadow hover:bg-red-700 transition">
                         進入指南
@@ -224,8 +283,6 @@
                 </div>
             </div>
         </section>
-
-
 
         <!-- 第 3 頁：邀請函 & 穿搭指南 -->
         <section class="page-card">
@@ -275,15 +332,15 @@
                         <div class="dress-code-grid">
                             <div class="dress-card red">
                                 <div class="font-bold text-red-600 text-sm mb-2">單號：紅隊</div>
-                                <div class="dress-img-container" style="background-color: #FFF5F5;">
-                                    <img src="https://lochoive-code.github.io/redwhitegames/red.png" alt="紅隊穿搭範例" onclick="openModal(this.src)">
+                                <div class="dress-img-container" style="background-color: #FFF5F5;" onclick="openModal('https://lochoive-code.github.io/redwhitegames/red.png')">
+                                    <img src="https://lochoive-code.github.io/redwhitegames/red.png" alt="紅隊穿搭範例">
                                 </div>
                                 <p class="text-xs text-gray-500 mt-auto">紅色元素 1/3 以上</p>
                             </div>
                             <div class="dress-card white">
                                 <div class="font-bold text-gray-600 text-sm mb-2">雙號：白隊</div>
-                                <div class="dress-img-container" style="background-color: #FAFAFA;">
-                                    <img src="https://lochoive-code.github.io/redwhitegames/white.png" alt="白隊穿搭範例" onclick="openModal(this.src)">
+                                <div class="dress-img-container" style="background-color: #FAFAFA;" onclick="openModal('https://lochoive-code.github.io/redwhitegames/white.png')">
+                                    <img src="https://lochoive-code.github.io/redwhitegames/white.png" alt="白隊穿搭範例">
                                 </div>
                                 <p class="text-xs text-gray-500 mt-auto">白色元素 1/3 以上</p>
                             </div>
@@ -320,12 +377,11 @@
             </div>
         </section>
 
-        <!-- P5: 座位配置 (優化版 - 兩張圖) -->
+        <!-- P5: 座位配置 (優化放大版) -->
         <section class="page-card">
             <div class="content-box">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">尾牙座位配置</h2>
                 
-                <!-- 第一張圖：全場總覽 -->
                 <div class="mb-4">
                     <p class="text-sm font-black text-gray-700 mb-2 flex items-center">
                         <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>全場座位總覽
@@ -334,26 +390,25 @@
                         <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_01.jpg" alt="全場座位總覽">
                         <div class="zoom-badge">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            點擊放大
+                            點擊/懸停放大
                         </div>
                     </div>
                 </div>
 
-                <!-- 第二張圖：詳細名單 -->
                 <div class="mb-2">
-                    <p class="text-sm font-black text-gray-700 mb-2 flex items-center">
-                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>桌號及詳細名單
+                    <p class="text-sm font-black text-red-700 mb-2 flex items-center">
+                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></span>桌號及詳細名單
                     </p>
-                    <div class="seat-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg')">
+                    <div class="seat-card list-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg')">
                         <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg" alt="詳細名單">
                         <div class="zoom-badge">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            點擊放大
+                            點擊看完整大圖
                         </div>
                     </div>
                 </div>
 
-                <p class="text-center text-[10px] text-gray-400 mt-4 italic">※ 點擊圖片可縮放查看詳細桌號與姓名</p>
+                <p class="text-center text-[10px] text-gray-400 mt-4 italic">※ 點擊名單可展開完整大圖並上下捲動</p>
             </div>
         </section>
 
@@ -378,8 +433,8 @@
 
                 <div class="section-title">🍀 紅白幸運星獎</div>
                 <div class="text-gray-700 text-sm leading-relaxed mb-6 space-y-2">
-                    <p>隨機抽出一名『紅白幸運星』<span class="highlight-red">
-                    <p>獲勝人數最多的隊伍中抽出1名『紅白幸運星』</p></span> 
+                    <p>隨機抽出一名『紅白幸運星』</p>
+                    <p><span class="highlight-red">獲勝人數最多的隊伍中抽出1名『紅白幸運星』</span></p>
                     <p>同隊參與者及加油者都具備抽獎資格</p>
                 </div>
 
@@ -389,11 +444,6 @@
                     <p>● 感謝大家熱情參與，祝活動順利，人人抽大獎！</p>
                     <p>● 當天下午 15:00 前可提前離開治裝打扮！</p>
                     <p>祝福活動順利，開心吃開心喝圓滿落幕，人人抽到獎喔！！！</p>
-                </div>
-
-                <div class="scroll-hint" id="gameHint">
-                    <p class="mb-1 text-xs">下滑查看完整細則</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
                 </div>
             </div>
         </section>
@@ -407,7 +457,7 @@
                     <img 
                         src="https://lochoive-code.github.io/redwhitegames/fightking.png" 
                         alt="紅白拳王視覺" 
-                        class="centered-img max-h-[50vh] object-contain"
+                        class="centered-img max-h-[50vh] object-contain cursor-pointer hover:scale-105 transition-transform duration-300"
                         onclick="openModal(this.src)"
                     >
                 </div>
@@ -436,7 +486,7 @@
 
                 <div class="quiz-card">
                     <div class="font-black text-red-600 text-lg mb-2">🎬 主題曲 / 廣告歌</div>
-                    <p class="text-sm text-gray-700">現場會播放一些戲劇主題曲或廣告台詞，請根據題目回答問題。這一關有兩種題型：選擇題——給你幾個答案選項，選出正確的！開放式答題——沒有選項，全靠你自己記憶力答出正確答案！</p>
+                    <p class="text-sm text-gray-700">現場會播放一些戲劇主題曲或廣告台詞，請根據題目回答問題。有選擇題與開放式答題兩種題型。</p>
                 </div>
 
                 <div class="quiz-card">
@@ -449,19 +499,14 @@
                     <p class="text-sm text-gray-700">現場會播放一些經典電影配樂，你的任務是根據題目選出正確答案！</p>
                 </div>
 
-                                <div class="quiz-card">
+                <div class="quiz-card">
                     <div class="font-black text-red-600 text-lg mb-2">🥁 我幫你選</div>
-                    <p class="text-sm text-gray-700">這一關會綜合前面所有音樂類型的題目，聽音樂答題！全部都是選擇題，請從選項中選出正確答案，答對即得分！</p>
-                </div>
-
-                <div class="scroll-hint" id="quizHint">
-                    <p class="mb-1 text-xs">下滑查看更多題型</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+                    <p class="text-sm text-gray-700">綜合前面所有類型的題目，全部都是選擇題，請從選項中選出正確答案！</p>
                 </div>
             </div>
         </section>
 
-        <!-- 9. 結尾頁 (這頁之前消失了) -->
+        <!-- 9. 結尾頁 -->
         <section class="page-card bg-red-pattern">
             <div class="content-box text-center py-10">
                 <h2 class="text-3xl font-black text-red-600 mb-6">感謝您的參與</h2>
@@ -473,10 +518,12 @@
 
     </div>
 
-    <!-- 圖片放大遮罩 -->
+    <!-- 圖片放大遮罩 (優化滾動與關閉) -->
     <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
         <div class="close-btn">✕</div>
-        <img id="zoomImage" src="" onclick="event.stopPropagation()">
+        <div class="zoom-img-container">
+            <img id="zoomImage" src="" onclick="event.stopPropagation()">
+        </div>
     </div>
 
     <script>
@@ -491,7 +538,11 @@
             currentPage = index;
             wrapper.style.transform = `translateX(-${currentPage * 100}vw)`;
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPage));
-            nextBtn.style.display = (currentPage === totalPages - 1) ? 'none' : 'flex';
+            
+            // 最後一頁隱藏下一步按鈕
+            if (nextBtn) {
+                nextBtn.style.display = (currentPage === totalPages - 1) ? 'none' : 'flex';
+            }
         }
 
         function nextPage() { scrollToPage(currentPage + 1); }
@@ -511,17 +562,30 @@
             const img = document.getElementById('zoomImage');
             img.src = src;
             overlay.style.display = 'flex';
+            // 讓名單長圖開啟時先回到頂部
+            overlay.scrollTop = 0;
             setTimeout(() => overlay.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden'; // 鎖住背景滾動
         }
 
         function closeModal() {
             const overlay = document.getElementById('zoomOverlay');
             overlay.classList.remove('show');
-            setTimeout(() => overlay.style.display = 'none', 300);
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = ''; 
+            }, 300);
         }
 
         dots.forEach((dot, i) => {
             dot.onclick = () => scrollToPage(i);
+        });
+        
+        // 鍵盤導航支援
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') scrollToPage(currentPage - 1);
+            if (e.key === 'Escape') closeModal();
         });
     </script>
 </body>
