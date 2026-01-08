@@ -68,6 +68,37 @@
             to { opacity: 1; transform: scale(1); }
         }
 
+        /* 座位圖優化樣式 */
+        .seat-card {
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 16px;
+            padding: 8px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            position: relative;
+            cursor: zoom-in;
+        }
+        .seat-card:active { transform: scale(0.98); }
+        .seat-card img { width: 100%; border-radius: 12px; display: block; }
+        
+        .zoom-badge {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(211, 47, 47, 0.85);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            backdrop-filter: blur(4px);
+        }
+
         .schedule-container {
             max-height: 380px;
             overflow-y: auto;
@@ -125,73 +156,37 @@
             border-radius: 5px;
         }
 
-        .centered-img {
-            max-width: 100%;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            height: auto;
-            border-radius: 8px;
-            cursor: zoom-in;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .dress-img-container {
-            height: 160px;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #f8f8f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .dress-img-container img { width: 100%; height: 100%; object-fit: contain; }
-
         .zoom-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .zoom-overlay.show { opacity: 1; }
-        .zoom-overlay img { max-width: 95%; max-height: 90%; object-fit: contain; transform: scale(0.9); transition: transform 0.3s ease; }
+        .zoom-overlay.show { opacity: 1; display: flex; }
+        .zoom-overlay img { max-width: 95%; max-height: 90%; object-fit: contain; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .zoom-overlay.show img { transform: scale(1); }
-        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 2.5rem; cursor: pointer; }
+        .close-btn { position: absolute; top: 25px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
 
         .section-title { color: var(--primary-red); font-weight: 900; font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
         .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.25rem; background-color: var(--primary-red); margin-right: 0.5rem; border-radius: 2px; }
-        .quiz-card { background: var(--light-red); border-left: 5px solid var(--primary-red); padding: 1rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
-
-        .dress-code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
-        .dress-card { border: 1px solid #eee; border-radius: 12px; padding: 10px; text-align: center; }
         
-        .info-row { display: flex; align-items: center; margin-bottom: 0.5rem; font-size: 0.95rem; }
-        .info-label { width: 4rem; font-weight: 900; color: var(--primary-red); flex-shrink: 0; }
-        .info-value { color: #374151; flex-grow: 1; }
+        .quiz-card { background: var(--light-red); border-left: 5px solid var(--primary-red); padding: 1rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
+        .highlight-red { color: var(--primary-red); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- 導覽圓點：確保有 9 個 -->
     <div class="pagination-dots" id="dots">
-        <div class="dot active" onclick="scrollToPage(0)"></div>
-        <div class="dot" onclick="scrollToPage(1)"></div>
-        <div class="dot" onclick="scrollToPage(2)"></div>
-        <div class="dot" onclick="scrollToPage(3)"></div>
-        <div class="dot" onclick="scrollToPage(4)"></div>
-        <div class="dot" onclick="scrollToPage(5)"></div>
-        <div class="dot" onclick="scrollToPage(6)"></div>
-        <div class="dot" onclick="scrollToPage(7)"></div>
-        <div class="dot" onclick="scrollToPage(8)"></div>
+        <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
 
-    <!-- 下一頁按鈕 -->
     <div class="nav-btn" id="nextBtn" onclick="nextPage()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7" />
@@ -200,7 +195,7 @@
 
     <div class="container-wrapper" id="mainWrapper">
         
-        <!-- 第 1 頁：封面 -->
+      <!-- 第 1 頁：封面 -->
         <section class="page-card bg-red-pattern">
             <div class="content-box text-center">
                 <h1 class="text-3xl font-black text-red-600 mb-4">2025 JPC 尾牙派對</h1>
@@ -325,36 +320,44 @@
             </div>
         </section>
 
-               <!-- P5: 座位圖 (重點修改頁) -->
+        <!-- P5: 座位配置 (優化版 - 兩張圖) -->
         <section class="page-card">
             <div class="content-box">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">尾牙座位配置</h2>
                 
-                <!-- 圖 1 -->
-                <p class="text-sm font-black text-gray-700 mb-2">全場座位總覽</p>
-                <div class="seat-img-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout.jpg')">
-                    <img src="https://lochoive-code.github_01.io/redwhitegames/tableiayout.jpg" alt="全場座位總覽">
-                    <div class="image-overlay-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        點擊放大
+                <!-- 第一張圖：全場總覽 -->
+                <div class="mb-4">
+                    <p class="text-sm font-black text-gray-700 mb-2 flex items-center">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>全場座位總覽
+                    </p>
+                    <div class="seat-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout_01.jpg')">
+                        <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_01.jpg" alt="全場座位總覽">
+                        <div class="zoom-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            點擊放大
+                        </div>
                     </div>
                 </div>
 
-                <!-- 圖 2 -->
-                <p class="text-sm font-black text-gray-700 mb-2">桌號座位表</p>
-                <div class="seat-img-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout2.jpg')">
-                    <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg" alt="桌號座位表">
-                    <div class="image-overlay-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        點擊放大
+                <!-- 第二張圖：詳細名單 -->
+                <div class="mb-2">
+                    <p class="text-sm font-black text-gray-700 mb-2 flex items-center">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>桌號及詳細名單
+                    </p>
+                    <div class="seat-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg')">
+                        <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg" alt="詳細名單">
+                        <div class="zoom-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            點擊放大
+                        </div>
                     </div>
                 </div>
 
-                <p class="text-center text-xs text-gray-400 mt-4 italic">※ 點擊上方圖片可查看清晰大圖</p>
+                <p class="text-center text-[10px] text-gray-400 mt-4 italic">※ 點擊圖片可縮放查看詳細桌號與姓名</p>
             </div>
         </section>
 
-                <!-- 第 6 頁：紅白遊戲細則 -->
+          <!-- 第 6 頁：紅白遊戲細則 -->
         <section class="page-card">
             <div class="content-box" id="gameBox">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">紅白大對抗：活動細則</h2>
@@ -375,7 +378,7 @@
 
                 <div class="section-title">🍀 紅白幸運星獎</div>
                 <div class="text-gray-700 text-sm leading-relaxed mb-6 space-y-2">
-                    <p>隨機抽出一名「紅白幸運星」 <span class="highlight-red">
+                    <p>隨機抽出一名『紅白幸運星』<span class="highlight-red">
                     <p>獲勝人數最多的隊伍中抽出1名『紅白幸運星』</p></span> 
                     <p>同隊參與者及加油者都具備抽獎資格</p>
                 </div>
@@ -470,7 +473,7 @@
 
     </div>
 
-   <!-- 圖片放大遮罩 (精化版) -->
+    <!-- 圖片放大遮罩 -->
     <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
         <div class="close-btn">✕</div>
         <img id="zoomImage" src="" onclick="event.stopPropagation()">
@@ -517,11 +520,9 @@
             setTimeout(() => overlay.style.display = 'none', 300);
         }
 
-        // 點擊點跳轉
         dots.forEach((dot, i) => {
             dot.onclick = () => scrollToPage(i);
         });
     </script>
 </body>
-</html>
 </html>
