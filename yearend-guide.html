@@ -445,122 +445,73 @@
             </div>
         </section>
 
-        <!-- 第 8 頁：結尾 -->
+         <!-- 9. 結尾頁 (這頁之前消失了) -->
         <section class="page-card bg-red-pattern">
             <div class="content-box text-center py-10">
                 <h2 class="text-3xl font-black text-red-600 mb-6">感謝您的參與</h2>
-                <p class="text-gray-700 mb-2 font-bold text-lg">2025 JPC紅白PLAY翻天</p>
-                <p class="text-gray-500 text-sm">馬年精神滿滿，行大運、創佳績！</p>
-                <button onclick="scrollToPage(0)" class="mt-10 px-10 py-3 border-2 border-red-600 text-red-600 font-black rounded-full bg-white shadow-lg transform transition active:scale-95">回封面頁</button>
+                <p class="text-gray-700 mb-2 font-bold text-lg">2025 JPC 紅白 PLAY 翻天</p>
+                <p class="text-gray-500 text-sm">祝福大家抽到大獎，馬到成功！</p>
+                <button onclick="scrollToPage(0)" class="mt-10 px-10 py-3 border-2 border-red-600 text-red-600 font-black rounded-full bg-white shadow-lg transform transition active:scale-95">回首頁</button>
             </div>
         </section>
+
     </div>
 
+    <!-- 圖片放大遮罩 -->
     <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
         <span class="close-btn">&times;</span>
-        <img id="zoomImage" src="" alt="放大圖片" onclick="event.stopPropagation()">
+        <img id="zoomImage" src="">
     </div>
 
     <script>
         let currentPage = 0;
-        const totalPages = 8;
+        const totalPages = 9; // 總共有 9 頁
         const wrapper = document.getElementById('mainWrapper');
         const dots = document.querySelectorAll('.dot');
         const nextBtn = document.getElementById('nextBtn');
-        
-        const hintConfigs = [
-            { box: 'gameBox', hint: 'gameHint' },
-            { box: 'quizBox', hint: 'quizHint' },
-            { box: 'dressBox', hint: 'dressHint' },
-            { box: 'scheduleScrollBox', hint: 'scheduleHint' }
-        ];
-
-        function updateScrollHints() {
-            hintConfigs.forEach(cfg => {
-                const box = document.getElementById(cfg.box);
-                const hint = document.getElementById(cfg.hint);
-                if (!box || !hint) return;
-                
-                const canScroll = box.scrollHeight > box.clientHeight + 5;
-                const isBottom = box.scrollHeight - box.scrollTop <= box.clientHeight + 10;
-                
-                hint.style.opacity = (canScroll && !isBottom) ? '1' : '0';
-                hint.style.visibility = (canScroll && !isBottom) ? 'visible' : 'hidden';
-            });
-        }
-
-        hintConfigs.forEach(cfg => {
-            const box = document.getElementById(cfg.box);
-            if (box) box.addEventListener('scroll', updateScrollHints);
-        });
 
         function scrollToPage(index) {
             if (index < 0 || index >= totalPages) return;
             currentPage = index;
             wrapper.style.transform = `translateX(-${currentPage * 100}vw)`;
+            
+            // 更新導覽點
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPage));
+            
+            // 最後一頁隱藏「下一頁」按鈕
             nextBtn.style.opacity = (currentPage === totalPages - 1) ? '0' : '1';
             nextBtn.style.pointerEvents = (currentPage === totalPages - 1) ? 'none' : 'auto';
-            
-            setTimeout(updateScrollHints, 300);
         }
 
         function nextPage() {
             if (currentPage < totalPages - 1) scrollToPage(currentPage + 1);
         }
 
+        // 觸控滑動支援
         let touchStartX = 0;
-        let touchStartY = 0;
-        window.addEventListener('touchstart', e => {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        }, false);
-
+        window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
         window.addEventListener('touchend', e => {
             let diffX = touchStartX - e.changedTouches[0].clientX;
-            let diffY = touchStartY - e.changedTouches[0].clientY;
-            
-            const scrollArea = e.target.closest('.schedule-container, .dress-code-container, .content-box');
-            if (scrollArea) {
-                if (Math.abs(diffY) > Math.abs(diffX)) return;
-            }
-
             if (Math.abs(diffX) > 50) {
                 if (diffX > 0) nextPage();
                 else scrollToPage(currentPage - 1);
             }
-        }, false);
+        });
 
-        window.addEventListener('wheel', e => {
-            const activeBox = e.target.closest('.schedule-container, .content-box, .dress-code-container');
-            if (activeBox) {
-                const isScrollingDown = e.deltaY > 0;
-                const isScrollingUp = e.deltaY < 0;
-                const canScrollDown = activeBox.scrollHeight > activeBox.clientHeight + activeBox.scrollTop + 5;
-                const canScrollUp = activeBox.scrollTop > 5;
-                if ((isScrollingDown && canScrollDown) || (isScrollingUp && canScrollUp)) return;
-            }
-            if (Math.abs(e.deltaY) > 20) {
-                if (e.deltaY > 0) nextPage();
-                else scrollToPage(currentPage - 1);
-            }
-        }, { passive: true });
-
+        // 圖片放大功能
         function openModal(src) {
             const overlay = document.getElementById('zoomOverlay');
             const img = document.getElementById('zoomImage');
             img.src = src;
             overlay.style.display = 'flex';
-            requestAnimationFrame(() => overlay.classList.add('show'));
+            setTimeout(() => overlay.classList.add('show'), 10);
         }
 
         function closeModal() {
             const overlay = document.getElementById('zoomOverlay');
             overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            setTimeout(() => overlay.style.display = 'none', 300);
         }
-
-        window.onload = updateScrollHints;
     </script>
 </body>
 </html>
