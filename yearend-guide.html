@@ -82,13 +82,6 @@
             overflow: hidden;
         }
         
-        /* 針對名單卡片特別放大處理 */
-        .seat-card.list-card {
-            padding: 12px;
-            background: #fffafa;
-            border: 1px dashed var(--primary-red);
-        }
-
         /* 電腦版 Hover 放大效果 */
         @media (min-width: 1024px) {
             .seat-card:hover {
@@ -97,7 +90,7 @@
                 border-color: var(--primary-red);
             }
             .seat-card:hover img {
-                transform: scale(1.08); /* 稍微增加放大比例 */
+                transform: scale(1.05);
             }
         }
         
@@ -193,32 +186,11 @@
             align-items: center;
             opacity: 0;
             transition: opacity 0.3s ease;
-            overflow-y: auto; /* 允許垂直滾動查看長圖 */
         }
         .zoom-overlay.show { opacity: 1; display: flex; }
-        
-        /* 放大後的圖片容器，確保長圖可以滾動 */
-        .zoom-img-container {
-            max-width: 95%;
-            max-height: 90%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* 名單長圖建議從頂部開始看 */
-            overflow: auto;
-            padding: 20px;
-        }
-
-        .zoom-overlay img { 
-            max-width: 100%; 
-            height: auto; 
-            object-fit: contain; 
-            transform: scale(0.9); 
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            border-radius: 4px;
-        }
+        .zoom-overlay img { max-width: 95%; max-height: 90%; object-fit: contain; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .zoom-overlay.show img { transform: scale(1); }
-        .close-btn { position: fixed; top: 25px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 1001; }
+        .close-btn { position: absolute; top: 25px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
 
         .section-title { color: var(--primary-red); font-weight: 900; font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
         .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.25rem; background-color: var(--primary-red); margin-right: 0.5rem; border-radius: 2px; }
@@ -226,12 +198,27 @@
         .quiz-card { background: var(--light-red); border-left: 5px solid var(--primary-red); padding: 1rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
         .highlight-red { color: var(--primary-red); font-weight: bold; }
 
-        /* 穿搭卡片樣式 */
+        /* 穿搭卡片樣式優化：改為 contain 並移除強制比例以顯示完整圖片 */
         .dress-code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .dress-card { border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; }
-        .dress-img-container { width: 100%; aspect-ratio: 1; border-radius: 8px; margin-bottom: 8px; overflow: hidden; cursor: pointer; }
-        .dress-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
-        .dress-img-container:hover img { transform: scale(1.1); }
+        .dress-card { border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; background: #fff; }
+        .dress-img-container { 
+            width: 100%; 
+            height: 200px; /* 固定高度但圖片完整顯示 */
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            overflow: hidden; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dress-img-container img { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; /* 關鍵修改：確保圖片完整不被切掉 */
+            transition: transform 0.3s; 
+        }
+        .dress-img-container:hover img { transform: scale(1.05); }
 
         .info-row { display: flex; margin-bottom: 8px; }
         .info-label { width: 60px; font-weight: 900; color: var(--primary-red); flex-shrink: 0; }
@@ -377,7 +364,7 @@
             </div>
         </section>
 
-        <!-- P5: 座位配置 (優化放大版) -->
+        <!-- P5: 座位配置 -->
         <section class="page-card">
             <div class="content-box">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">尾牙座位配置</h2>
@@ -396,19 +383,19 @@
                 </div>
 
                 <div class="mb-2">
-                    <p class="text-sm font-black text-red-700 mb-2 flex items-center">
-                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></span>桌號及詳細名單
+                    <p class="text-sm font-black text-gray-700 mb-2 flex items-center">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>桌號及詳細名單
                     </p>
-                    <div class="seat-card list-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg')">
+                    <div class="seat-card" onclick="openModal('https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg')">
                         <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg" alt="詳細名單">
                         <div class="zoom-badge">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            點擊看完整大圖
+                            點擊/懸停放大
                         </div>
                     </div>
                 </div>
 
-                <p class="text-center text-[10px] text-gray-400 mt-4 italic">※ 點擊名單可展開完整大圖並上下捲動</p>
+                <p class="text-center text-[10px] text-gray-400 mt-4 italic">※ 點擊圖片展開全螢幕預覽</p>
             </div>
         </section>
 
@@ -518,12 +505,10 @@
 
     </div>
 
-    <!-- 圖片放大遮罩 (優化滾動與關閉) -->
+    <!-- 圖片放大遮罩 -->
     <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
         <div class="close-btn">✕</div>
-        <div class="zoom-img-container">
-            <img id="zoomImage" src="" onclick="event.stopPropagation()">
-        </div>
+        <img id="zoomImage" src="" onclick="event.stopPropagation()">
     </div>
 
     <script>
@@ -562,19 +547,13 @@
             const img = document.getElementById('zoomImage');
             img.src = src;
             overlay.style.display = 'flex';
-            // 讓名單長圖開啟時先回到頂部
-            overlay.scrollTop = 0;
             setTimeout(() => overlay.classList.add('show'), 10);
-            document.body.style.overflow = 'hidden'; // 鎖住背景滾動
         }
 
         function closeModal() {
             const overlay = document.getElementById('zoomOverlay');
             overlay.classList.remove('show');
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                document.body.style.overflow = ''; 
-            }, 300);
+            setTimeout(() => overlay.style.display = 'none', 300);
         }
 
         dots.forEach((dot, i) => {
