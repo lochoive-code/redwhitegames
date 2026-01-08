@@ -24,7 +24,7 @@
         .container-wrapper {
             display: flex;
             height: 100vh;
-            width: 900vw; 
+            width: 900vw; /* 總共 9 頁 */
             transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
@@ -40,7 +40,7 @@
             box-sizing: border-box;
             position: relative;
             background: white;
-            border-right: 2px solid var(--light-red);
+            border-right: 1px solid #eee;
         }
 
         .bg-red-pattern {
@@ -76,7 +76,6 @@
             margin: 0 auto;
             width: 100%;
             max-width: 400px;
-            position: relative;
         }
 
         .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
@@ -157,33 +156,29 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
         .zoom-overlay.show { opacity: 1; }
         .zoom-overlay img { max-width: 95%; max-height: 90%; object-fit: contain; transform: scale(0.9); transition: transform 0.3s ease; }
         .zoom-overlay.show img { transform: scale(1); }
-        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 2.5rem; cursor: pointer; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.2); border-radius: 50%; z-index: 1001; }
+        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 2.5rem; cursor: pointer; }
 
         .section-title { color: var(--primary-red); font-weight: 900; font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
         .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.25rem; background-color: var(--primary-red); margin-right: 0.5rem; border-radius: 2px; }
         .quiz-card { background: var(--light-red); border-left: 5px solid var(--primary-red); padding: 1rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
 
-        .dress-code-container { max-height: 300px; overflow-y: auto; position: relative; padding-bottom: 1rem; }
         .dress-code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
         .dress-card { border: 1px solid #eee; border-radius: 12px; padding: 10px; text-align: center; }
-        .dress-card.red { border-top: 4px solid #D32F2F; background: #FFF5F5; }
-        .dress-card.white { border-top: 4px solid #E0E0E0; background: #FAFAFA; }
-
+        
         .info-row { display: flex; align-items: center; margin-bottom: 0.5rem; font-size: 0.95rem; }
         .info-label { width: 4rem; font-weight: 900; color: var(--primary-red); flex-shrink: 0; }
         .info-value { color: #374151; flex-grow: 1; }
-        .map-link { color: #2563eb; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px; }
     </style>
 </head>
 <body>
 
+    <!-- 導覽圓點：確保有 9 個 -->
     <div class="pagination-dots" id="dots">
         <div class="dot active" onclick="scrollToPage(0)"></div>
         <div class="dot" onclick="scrollToPage(1)"></div>
@@ -196,6 +191,7 @@
         <div class="dot" onclick="scrollToPage(8)"></div>
     </div>
 
+    <!-- 下一頁按鈕 -->
     <div class="nav-btn" id="nextBtn" onclick="nextPage()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7" />
@@ -204,7 +200,6 @@
 
     <div class="container-wrapper" id="mainWrapper">
         
-
         <!-- 第 1 頁：封面 -->
         <section class="page-card bg-red-pattern">
             <div class="content-box text-center">
@@ -445,7 +440,7 @@
             </div>
         </section>
 
-         <!-- 9. 結尾頁 (這頁之前消失了) -->
+        <!-- 9. 結尾頁 (這頁之前消失了) -->
         <section class="page-card bg-red-pattern">
             <div class="content-box text-center py-10">
                 <h2 class="text-3xl font-black text-red-600 mb-6">感謝您的參與</h2>
