@@ -158,6 +158,22 @@
             border-radius: 5px;
         }
 
+        /* 滿版圖片樣式 (針對需求修改) */
+        .full-bleed-img {
+            width: calc(100% + 3rem); /* 補回 content-box 的 padding */
+            margin-left: -1.5rem;
+            margin-right: -1.5rem;
+            display: block;
+            height: auto; /* 自動高度，確保不裁切 */
+            object-fit: cover; /* 填滿寬度 */
+            cursor: zoom-in;
+            transition: opacity 0.3s;
+        }
+        .full-bleed-img:hover {
+            opacity: 0.9;
+        }
+
+        /* 燈箱樣式 (針對需求修改) */
         .zoom-overlay {
             display: none;
             position: fixed;
@@ -166,6 +182,44 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .zoom-overlay.show {
+            opacity: 1;
+        }
+        .zoom-overlay img {
+            max-width: 95%;
+            max-height: 90%;
+            object-fit: contain; /* 保持比例，完整顯示 */
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .zoom-overlay.show img {
+            transform: scale(1);
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: background 0.3s;
+            z-index: 1001;
+        }
+        .close-btn:hover {
+            background: rgba(255,255,255,0.4);
         }
 
         .img-placeholder {
@@ -339,14 +393,20 @@
             </div>
         </section>
 
-        <!-- 第 4 頁：座位圖 -->
+        <!-- 第 4 頁：座位圖 (修改) -->
         <section class="page-card">
             <div class="content-box text-center">
                 <h2 class="text-2xl font-bold text-red-600 mb-4">尾牙座位配置</h2>
-                <div class="img-placeholder h-64 border-red-200 cursor-pointer" onclick="toggleZoom(true)">
-                    <img src="https://placehold.co/600x400/ffffff/D32F2F?text=Seating+Chart" alt="座位圖" class="w-full h-full object-contain">
-                </div>
-                <p class="mt-4 text-sm text-gray-500">※ 點擊圖片可放大查看</p>
+                
+                <!-- 滿版圖片區塊 -->
+                <img 
+                    src="https://lochoive-code.github.io/redwhitegames/tableiayout.jpeg" 
+                    alt="座位圖" 
+                    class="full-bleed-img"
+                    onclick="openModal(this.src)"
+                >
+                
+                <p class="mt-4 text-sm text-gray-500">※ 點擊圖片可放大查看細節</p>
             </div>
         </section>
 
@@ -389,18 +449,25 @@
             </div>
         </section>
 
-        <!-- 第 6 頁：好禮抽不停 (順序調換) -->
+        <!-- 第 6 頁：好禮抽不停 (修改) -->
         <section class="page-card">
             <div class="content-box text-center">
-                <h2 class="text-3xl font-black text-red-600 mb-6">好禮抽不停！</h2>
-                <div class="img-placeholder h-72">
-                    <img src="https://placehold.co/500x500/D32F2F/white?text=Grand+Prizes" alt="獎品圖" class="w-full h-full object-cover">
-                </div>
+                <h2 class="text-3xl font-black text-red-600 mb-6">紅白拳王爭霸戰</h2>
+                
+                <!-- 滿版圖片區塊 -->
+                <img 
+                    src="https://lochoive-code.github.io/redwhitegames/fightking.png" 
+                    alt="紅白拳王視覺" 
+                    class="full-bleed-img"
+                    onclick="openModal(this.src)"
+                >
+
                 <p class="mt-6 text-lg font-bold text-gray-800">總獎價值超過百萬，敬請期待！</p>
+                <p class="text-xs text-gray-400 mt-2">（點擊圖片可放大）</p>
             </div>
         </section>
 
-        <!-- 第 7 頁：紅白對抗：遊戲題型 (順序調換) -->
+        <!-- 第 7 頁：紅白對抗：遊戲題型 -->
         <section class="page-card">
             <div class="content-box" id="quizBox">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">紅白對抗：遊戲題型</h2>
@@ -471,8 +538,10 @@
         </section>
     </div>
 
-    <div id="zoomOverlay" class="zoom-overlay" onclick="toggleZoom(false)">
-        <img src="https://placehold.co/1000x800/ffffff/D32F2F?text=Full+Seating+Map" alt="放大圖片">
+    <!-- 彈出視窗 (Modal) -->
+    <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
+        <span class="close-btn">&times;</span>
+        <img id="zoomImage" src="" alt="放大圖片" onclick="event.stopPropagation()">
     </div>
 
     <script>
@@ -559,8 +628,25 @@
             }
         }, { passive: true });
 
-        function toggleZoom(show) {
-            document.getElementById('zoomOverlay').style.display = show ? 'flex' : 'none';
+        // 燈箱功能
+        function openModal(src) {
+            const overlay = document.getElementById('zoomOverlay');
+            const img = document.getElementById('zoomImage');
+            img.src = src;
+            overlay.style.display = 'flex';
+            // 強制重繪以觸發 transition
+            requestAnimationFrame(() => {
+                overlay.classList.add('show');
+            });
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('zoomOverlay');
+            overlay.classList.remove('show');
+            // 等待動畫結束後隱藏
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
         }
 
         // 初始化
