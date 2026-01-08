@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>2025 JPC尾牙活動指南</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -19,12 +19,13 @@
             overflow: hidden; 
             background-color: #f4f4f4;
             margin: 0;
+            touch-action: none; /* 防止瀏覽器預設手勢干擾自定義翻頁 */
         }
 
         .container-wrapper {
             display: flex;
             height: 100vh;
-            width: 900vw; /* 總共 9 頁 */
+            width: 900vw; 
             transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
 
@@ -61,6 +62,7 @@
             animation: fadeIn 0.8s ease-out;
             -webkit-overflow-scrolling: touch;
             position: relative;
+            touch-action: pan-y; /* 內容盒允許垂直捲動 */
         }
 
         @keyframes fadeIn {
@@ -82,24 +84,10 @@
             overflow: hidden;
         }
         
-        /* 電腦版 Hover 放大效果 */
-        @media (min-width: 1024px) {
-            .seat-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-                border-color: var(--primary-red);
-            }
-            .seat-card:hover img {
-                transform: scale(1.05);
-            }
-        }
-        
-        .seat-card:active { transform: scale(0.98); }
         .seat-card img { 
             width: 100%; 
             border-radius: 12px; 
             display: block; 
-            transition: transform 0.5s ease;
         }
         
         .zoom-badge {
@@ -119,22 +107,7 @@
             z-index: 2;
         }
 
-        .schedule-container {
-            max-height: 380px;
-            overflow-y: auto;
-            border-radius: 12px;
-            border: 1px solid #fee2e2;
-            margin: 0 auto;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .schedule-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-        .schedule-table thead { position: sticky; top: 0; z-index: 10; }
-        .schedule-table th { background-color: var(--primary-red); color: white; padding: 12px; text-align: center; font-weight: 900; }
-        .schedule-table td { padding: 14px 12px; border-bottom: 1px solid #ffdada; color: #333; background: white; text-align: center; }
-        .time-col { width: 40%; font-weight: 700; color: var(--primary-red); }
-
+        /* 導航 UI */
         .nav-btn {
             position: fixed;
             bottom: 40px;
@@ -176,21 +149,57 @@
             border-radius: 5px;
         }
 
+        /* 縮放模態框優化 (可拖動與縮放) */
         .zoom-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
+            background: rgba(0,0,0,0.92);
+            z-index: 2000;
             justify-content: center;
             align-items: center;
             opacity: 0;
             transition: opacity 0.3s ease;
+            touch-action: none; /* 禁用預設手勢以實現自定義縮放 */
         }
         .zoom-overlay.show { opacity: 1; display: flex; }
-        .zoom-overlay img { max-width: 95%; max-height: 90%; object-fit: contain; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .zoom-overlay.show img { transform: scale(1); }
-        .close-btn { position: absolute; top: 25px; right: 25px; color: white; font-size: 2rem; cursor: pointer; background: rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        
+        .zoom-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .zoom-image {
+            max-width: none;
+            max-height: none;
+            transform-origin: center center;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .zoom-image:active { cursor: grabbing; }
+
+        .close-btn { 
+            position: absolute; 
+            top: 25px; 
+            right: 25px; 
+            color: white; 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            background: rgba(255,255,255,0.2); 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            z-index: 2010;
+        }
 
         .section-title { color: var(--primary-red); font-weight: 900; font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; }
         .section-title::before { content: ''; display: inline-block; width: 4px; height: 1.25rem; background-color: var(--primary-red); margin-right: 0.5rem; border-radius: 2px; }
@@ -198,12 +207,11 @@
         .quiz-card { background: var(--light-red); border-left: 5px solid var(--primary-red); padding: 1rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
         .highlight-red { color: var(--primary-red); font-weight: bold; }
 
-        /* 穿搭卡片樣式優化：改為 contain 並移除強制比例以顯示完整圖片 */
         .dress-code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .dress-card { border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; background: #fff; }
         .dress-img-container { 
             width: 100%; 
-            height: 200px; /* 固定高度但圖片完整顯示 */
+            height: 200px; 
             border-radius: 8px; 
             margin-bottom: 8px; 
             overflow: hidden; 
@@ -215,14 +223,23 @@
         .dress-img-container img { 
             max-width: 100%; 
             max-height: 100%; 
-            object-fit: contain; /* 關鍵修改：確保圖片完整不被切掉 */
-            transition: transform 0.3s; 
+            object-fit: contain; 
         }
-        .dress-img-container:hover img { transform: scale(1.05); }
 
         .info-row { display: flex; margin-bottom: 8px; }
         .info-label { width: 60px; font-weight: 900; color: var(--primary-red); flex-shrink: 0; }
         .info-value { color: #444; }
+
+        .schedule-container {
+            max-height: 380px;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid #fee2e2;
+            width: 100%;
+        }
+        .schedule-table { width: 100%; border-collapse: collapse; }
+        .schedule-table th { background: var(--primary-red); color: white; padding: 10px; position: sticky; top: 0; }
+        .schedule-table td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -241,7 +258,7 @@
 
     <div class="container-wrapper" id="mainWrapper">
         
-      <!-- 第 1 頁：封面 -->
+        <!-- 第 1 頁：封面 -->
         <section class="page-card bg-red-pattern">
             <div class="content-box text-center">
                 <h1 class="text-3xl font-black text-red-600 mb-4">2025 JPC 尾牙派對</h1>
@@ -364,7 +381,7 @@
             </div>
         </section>
 
-        <!-- P5: 座位配置 -->
+        <!-- P5: 座位配置 (核心更新) -->
         <section class="page-card">
             <div class="content-box">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">尾牙座位配置</h2>
@@ -377,7 +394,7 @@
                         <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_01.jpg" alt="全場座位總覽">
                         <div class="zoom-badge">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            點擊/懸停放大
+                            點擊放大看桌號人名
                         </div>
                     </div>
                 </div>
@@ -390,16 +407,14 @@
                         <img src="https://lochoive-code.github.io/redwhitegames/tableiayout_02.jpg" alt="詳細名單">
                         <div class="zoom-badge">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            點擊/懸停放大
+                            點擊放大/拖曳/雙指縮放
                         </div>
                     </div>
                 </div>
-
-                <p class="text-center text-[10px] text-gray-400 mt-4 italic">※ 點擊圖片展開全螢幕預覽</p>
             </div>
         </section>
 
-          <!-- 第 6 頁：紅白遊戲細則 -->
+         <!-- 第 6 頁：紅白遊戲細則 -->
         <section class="page-card">
             <div class="content-box" id="gameBox">
                 <h2 class="text-2xl font-black text-red-600 text-center mb-6">紅白大對抗：活動細則</h2>
@@ -505,13 +520,16 @@
 
     </div>
 
-    <!-- 圖片放大遮罩 -->
+    <!-- 全螢幕縮放遮罩 (自定義 Lightbox) -->
     <div id="zoomOverlay" class="zoom-overlay" onclick="closeModal()">
         <div class="close-btn">✕</div>
-        <img id="zoomImage" src="" onclick="event.stopPropagation()">
+        <div class="zoom-container" id="zoomContainer">
+            <img id="zoomImage" class="zoom-image" src="" onclick="event.stopPropagation()">
+        </div>
     </div>
 
     <script>
+        // 頁面導航邏輯
         let currentPage = 0;
         const totalPages = 9;
         const wrapper = document.getElementById('mainWrapper');
@@ -523,49 +541,132 @@
             currentPage = index;
             wrapper.style.transform = `translateX(-${currentPage * 100}vw)`;
             dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPage));
-            
-            // 最後一頁隱藏下一步按鈕
-            if (nextBtn) {
-                nextBtn.style.display = (currentPage === totalPages - 1) ? 'none' : 'flex';
-            }
+            if (nextBtn) nextBtn.style.display = (currentPage === totalPages - 1) ? 'none' : 'flex';
         }
 
         function nextPage() { scrollToPage(currentPage + 1); }
 
+        // 翻頁手勢
         let touchStartX = 0;
-        window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+        window.addEventListener('touchstart', e => { 
+            if(isZoomed) return;
+            touchStartX = e.touches[0].clientX; 
+        }, {passive: true});
+        
         window.addEventListener('touchend', e => {
+            if(isZoomed) return;
             let diffX = touchStartX - e.changedTouches[0].clientX;
-            if (Math.abs(diffX) > 50) {
+            if (Math.abs(diffX) > 60) {
                 if (diffX > 0) nextPage();
                 else scrollToPage(currentPage - 1);
             }
         });
 
+        // 縮放與拖曳邏輯
+        const overlay = document.getElementById('zoomOverlay');
+        const zoomImg = document.getElementById('zoomImage');
+        let isZoomed = false;
+        
+        let scale = 1;
+        let lastScale = 1;
+        let posX = 0;
+        let posY = 0;
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let touchDistance = 0;
+
         function openModal(src) {
-            const overlay = document.getElementById('zoomOverlay');
-            const img = document.getElementById('zoomImage');
-            img.src = src;
+            zoomImg.src = src;
             overlay.style.display = 'flex';
+            isZoomed = true;
+            
+            // 重置狀態
+            scale = 1;
+            posX = 0;
+            posY = 0;
+            updateTransform();
+            
             setTimeout(() => overlay.classList.add('show'), 10);
         }
 
         function closeModal() {
-            const overlay = document.getElementById('zoomOverlay');
             overlay.classList.remove('show');
+            isZoomed = false;
             setTimeout(() => overlay.style.display = 'none', 300);
         }
 
-        dots.forEach((dot, i) => {
-            dot.onclick = () => scrollToPage(i);
-        });
-        
-        // 鍵盤導航支援
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') nextPage();
-            if (e.key === 'ArrowLeft') scrollToPage(currentPage - 1);
-            if (e.key === 'Escape') closeModal();
-        });
+        function updateTransform() {
+            zoomImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+        }
+
+        // 滑鼠滾輪縮放
+        overlay.addEventListener('wheel', e => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const nextScale = scale * delta;
+            if (nextScale >= 0.5 && nextScale <= 5) {
+                scale = nextScale;
+                updateTransform();
+            }
+        }, {passive: false});
+
+        // 拖曳與觸控手勢
+        const startMove = (e) => {
+            if (!isZoomed) return;
+            isDragging = true;
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
+            startX = clientX - posX;
+            startY = clientY - posY;
+
+            if (e.type === 'touchstart' && e.touches.length === 2) {
+                touchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                lastScale = scale;
+            }
+        };
+
+        const onMove = (e) => {
+            if (!isDragging || !isZoomed) return;
+            e.preventDefault();
+
+            if (e.type === 'touchmove' && e.touches.length === 2) {
+                // 雙指縮放
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const ratio = dist / touchDistance;
+                const nextScale = lastScale * ratio;
+                if (nextScale >= 0.5 && nextScale <= 5) {
+                    scale = nextScale;
+                }
+            } else {
+                // 單指或滑鼠拖曳
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                posX = clientX - startX;
+                posY = clientY - startY;
+            }
+            updateTransform();
+        };
+
+        const stopMove = () => { isDragging = false; };
+
+        overlay.addEventListener('mousedown', startMove);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', stopMove);
+
+        overlay.addEventListener('touchstart', startMove, {passive: false});
+        overlay.addEventListener('touchmove', onMove, {passive: false});
+        overlay.addEventListener('touchend', stopMove);
+
+        // 點擊圓點導航
+        dots.forEach((dot, i) => { dot.onclick = () => scrollToPage(i); });
     </script>
 </body>
 </html>
